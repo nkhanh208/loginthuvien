@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Library</title>
+
+<style>
+/* ===== RESET ===== */
+/* ================= RESET ================= */
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+html,body{
+  height:100%;
+  overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:linear-gradient(135deg,#dfe9f3,#ffffff);
+}
+
+/* ================= LAYOUT ================= */
+body{
+  display:flex;
+  height:100vh;
+}
+
+/* ================= GLASS BASE ================= */
+.glass{
+  background:rgba(255,255,255,0.25);
+  backdrop-filter:blur(30px) saturate(160%);
+  -webkit-backdrop-filter:blur(30px) saturate(160%);
+  border:1px solid rgba(255,255,255,0.4);
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+  border-radius:24px;
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar{
+  width:260px;
+  padding:25px 20px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.sidebar{
+  background:rgba(255,255,255,0.35);
+  backdrop-filter:blur(35px);
+  border-right:1px solid rgba(255,255,255,0.5);
+}
+
+.profile{
+  text-align:center;
+  margin-bottom:25px;
+}
+
+.profile img{
+  width:85px;
+  height:85px;
+  border-radius:50%;
+  object-fit:cover;
+  margin-bottom:12px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.15);
+}
+
+.profile h3{
+  font-size:16px;
+  font-weight:600;
+}
+
+.profile p{
+  font-size:13px;
+  opacity:0.7;
+}
+
+/* ================= NAV ================= */
+.nav-btn{
+  background:transparent;
+  border:none;
+  padding:12px 14px;
+  text-align:left;
+  border-radius:14px;
+  cursor:pointer;
+  transition:0.25s ease;
+  font-size:15px;
+}
+
+.nav-btn:hover{
+  background:rgba(255,255,255,0.35);
+}
+
+.nav-btn.active{
+  background:rgba(255,255,255,0.55);
+  backdrop-filter:blur(15px);
+  box-shadow:0 4px 15px rgba(0,0,0,0.08);
+  font-weight:600;
+}
+
+/* ================= LOGOUT ================= */
+.logout{
+  margin-top:auto;
+  border:none;
+  padding:12px;
+  border-radius:18px;
+  background:linear-gradient(135deg,#ff4d4d,#ff1a1a);
+  color:white;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.logout:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(255,0,0,0.3);
+}
+
+/* ================= MAIN ================= */
+.main{
+  flex:1;
+  padding:40px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+/* ================= SECTION ================= */
+.section{
+  display:none;
+  flex:1;
+  overflow:hidden;
+  animation:fadeIn 0.4s ease;
+}
+
+.section.active{
+  display:flex;
+  flex-direction:column;
+}
+
+/* ================= BOARD ================= */
+.board{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:25px;
+  height:100%;
+}
+
+/* ================= COLUMN GLASS ================= */
+.column{
+  display:flex;
+  flex-direction:column;
+  padding:20px;
+  overflow:hidden;
+  background:rgba(255,255,255,0.35);
+  backdrop-filter:blur(30px);
+  border-radius:28px;
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.6);
+}
+
+.column h3{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.column > div{
+  flex:1;
+  overflow-y:auto;
+  padding-right:5px;
+}
+
+/* ================= CARD ================= */
+.card{
+  background:rgba(255,255,255,0.45);
+  backdrop-filter:blur(20px);
+  padding:16px;
+  border-radius:20px;
+  margin-bottom:12px;
+  transition:0.25s ease;
+  border-left:6px solid rgba(255,255,255,0.6);
+  box-shadow:0 6px 18px rgba(0,0,0,0.08);
+}
+
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 15px 35px rgba(0,0,0,0.15);
+}
+
+.borrowing{ border-left-color:#ffb020; }
+.overdue{ border-left-color:#ff3b30; }
+.returned{ border-left-color:#34c759; }
+
+/* ================= BADGE ================= */
+.badge{
+  background:rgba(0,0,0,0.7);
+  color:white;
+  font-size:12px;
+  padding:4px 10px;
+  border-radius:20px;
+  backdrop-filter:blur(10px);
+}
+
+/* ================= HISTORY ================= */
+#historyList{
+  flex:1;
+  overflow-y:auto;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+  gap:18px;
+  align-content: start;
+}
+
+/* ================= FEEDBACK ================= */
+#feedback iframe{
+  flex:1;
+  width:100%;
+  border:none;
+  border-radius:28px;
+  backdrop-filter:blur(20px);
+}
+
+/* ================= DIGITAL CARD (THẺ THƯ VIỆN) ================= */
+.digital-card-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 10px;
+}
+
+.digital-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  width: 100%;
+  max-width: 380px;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.digital-card::before {
+  content: '';
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+  top: -100px;
+  right: -100px;
+}
+
+.digital-card::after {
+  content: '';
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  bottom: -50px;
+  left: -50px;
+}
+
+.card-content {
+  position: relative;
+  z-index: 2;
+}
+
+.card-header-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.card-brand {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.8;
+  font-weight: bold;
+}
+
+.card-name {
+  font-size: 24px;
+  font-weight: 800;
+  margin-top: 5px;
+}
+
+.card-role {
+  font-size: 13px;
+  background: rgba(255,255,255,0.2);
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 8px;
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+.card-detail-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding-bottom: 8px;
+  margin-bottom: 12px;
+  align-items: flex-end;
+}
+
+.card-detail-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  font-weight: 600;
+}
+
+.card-detail-value {
+  font-family: monospace;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.card-detail-text {
+  font-size: 14px;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.no-card-wrapper {
+  text-align: center;
+  padding: 50px 20px;
+  background: rgba(255,255,255,0.35);
+  backdrop-filter: blur(30px);
+  border-radius: 28px;
+  margin-top: 20px;
+}
+
+.btn-register-link {
+  display: inline-block;
+  margin-top: 20px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  text-decoration: none;
+  padding: 14px 28px;
+  border-radius: 16px;
+  font-weight: bold;
+  font-size: 16px;
+  transition: 0.3s;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+}
+
+.btn-register-link:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(37, 99, 235, 0.4);
+}
+
+/* ================= HIDE SCROLLBAR ================= */
+::-webkit-scrollbar{
+  width:0px;
+  background:transparent;
+}
+
+*{
+  scrollbar-width:none;
+}
+
+/* ================= FADE ================= */
+@keyframes fadeIn{
+  from{ opacity:0; transform:translateY(12px); }
+  to{ opacity:1; transform:translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="profile">
+    <img id="avatar" src="https://i.pravatar.cc/150" alt="Avatar">
+    <h3 id="name">Đang tải...</h3>
+    <p id="email"></p>
+  </div>
+
+  <button class="nav-btn active" onclick="showSection('home', this)">📚 Trang chính</button>
+  <button class="nav-btn" onclick="showSection('history', this)">📖 Lịch sử mượn</button>
+  <button class="nav-btn" onclick="showSection('libraryCard', this)">🎟️ Thẻ thư viện</button>
+  <button class="nav-btn" onclick="showSection('feedback', this)">💬 Feedback</button>
+
+  <button class="logout" onclick="logout()">Đăng xuất</button>
+</div>
+
+<div class="main">
+
+  <!-- TRANG CHÍNH: Chỉ hiện sách ĐANG MƯỢN và QUÁ HẠN -->
+  <div id="home" class="section active">
+    <div class="board" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
+      <div class="column">
+        <h3>🟡 Đang mượn <span class="badge" id="borrowCount">0</span></h3>
+        <div id="borrowList"></div>
+      </div>
+      <div class="column">
+        <h3>🔴 Quá hạn <span class="badge" id="overdueCount">0</span></h3>
+        <div id="overdueList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRANG LỊCH SỬ: Chứa toàn bộ sách ĐÃ TRẢ -->
+  <div id="history" class="section">
+    <h2 style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+      <span>📖 Lịch sử mượn (Đã trả)</span>
+      <span class="badge returned" id="historyCount" style="background:#34c759; padding: 6px 14px; font-size: 15px;">0</span>
+    </h2>
+    <div id="historyList"></div>
+  </div>
+
+  <div id="libraryCard" class="section">
+    <h2>🎟️ Thẻ Thư Viện Của Bạn</h2>
+    
+    <!-- Loading text -->
+    <div id="loading-card" style="text-align: center; padding: 40px;">
+      <p>Đang kiểm tra hệ thống thẻ...</p>
+    </div>
+
+    <!-- View khi ĐÃ CÓ THẺ -->
+    <div id="has-card-view" style="display: none;">
+      <div class="digital-card-wrapper">
+        <div class="digital-card">
+          <div class="card-content">
+            <div class="card-header-top">
+              <div>
+                <div class="card-brand">NHC Library</div>
+                <div class="card-name" id="my-card-name">---</div>
+                <div class="card-role" id="my-card-role">---</div>
+              </div>
+              <div style="font-size: 35px;">🏛️</div>
+            </div>
+            
+            <div class="card-detail-row">
+              <span class="card-detail-label">Mã Thẻ</span>
+              <span class="card-detail-value" id="my-card-id">---</span>
+            </div>
+            <div class="card-detail-row" style="border: none; padding-bottom: 0;">
+              <span class="card-detail-label">Email</span>
+              <span class="card-detail-text" id="my-card-email">---</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View khi CHƯA CÓ THẺ -->
+    <div id="no-card-view" class="no-card-wrapper" style="display: none;">
+      <h3 style="font-size: 20px; margin-bottom: 10px; color: #333;">Bạn chưa có thẻ thư viện</h3>
+      <p style="color: #666;">Vui lòng đăng ký thông tin để hệ thống tạo thẻ điện tử cho bạn nhé.</p>
+      <a href="https://nkhanh208.github.io/thethuvien/" target="_blank" class="btn-register-link">Tạo thẻ ngay</a>
+    </div>
+  </div>
+
+  <div id="feedback" class="section">
+    <iframe src="feedback.html"></iframe>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  signOut 
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { 
+  getFirestore,
+  doc,
+  updateDoc,
+  serverTimestamp,
+  onSnapshot,
+  collection, 
+  query, 
+  where, 
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+// ================= APP 1: QUẢN LÝ TÀI KHOẢN (GỐC) =================
+const firebaseConfig = {
+  apiKey: "AIzaSyCEdkzclcyqLDQv8kRUBN4l71AggHn1jKc",
+  authDomain: "student-admin-system-f92e7.firebaseapp.com",
+  projectId: "student-admin-system-f92e7",
+  storageBucket: "student-admin-system-f92e7.firebasestorage.app",
+  messagingSenderId: "693112425401",
+  appId: "1:693112425401:web:dd2285bd4eada7a6750468"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ================= APP 2: ĐỌC DỮ LIỆU THẺ TỪ TRANG ĐĂNG KÝ =================
+const cardFirebaseConfig = {
+  apiKey: "AIzaSyCgpPUYV5lqZ_5zUua8Q_ThNEIkPsEg2do",
+  authDomain: "thuvien-44050.firebaseapp.com",
+  projectId: "thuvien-44050",
+  storageBucket: "thuvien-44050.firebasestorage.app",
+  messagingSenderId: "926801895944",
+  appId: "1:926801895944:web:72a42302cfc85a998da7bd",
+  measurementId: "G-TMJB630SHL"
+};
+const cardApp = initializeApp(cardFirebaseConfig, "cardApp");
+const cardDb = getFirestore(cardApp);
+
+// LINK GOOGLE SHEET
+const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBheU1Zxps0sQ0DTdJtRzbaFE3Wm2g-vr8mO4GYKmr9raDtKET7xpOnnTcygnkkKGHwx7LzJBETL72/pub?output=csv";
+
+let unsubscribeSnapshot = null;
+
+// ================= AUTH CHECK VÀ REALTIME ONLINE/OFFLINE =================
+onAuthStateChanged(auth, async (user)=>{
+
+  if(!user){
+    window.location.href="index.html";
+    return;
+  }
+
+  const userRef = doc(db, "users", user.uid);
+
+  // BÁO CÁO TRẠNG THÁI ONLINE LÊN FIREBASE KHI ĐĂNG NHẬP THÀNH CÔNG
+  try {
+    await updateDoc(userRef, {
+      online: true,
+      lastSeen: serverTimestamp()
+    });
+  } catch (error) {
+    console.error("Lỗi cập nhật trạng thái online:", error);
+  }
+
+  if(unsubscribeSnapshot){
+    unsubscribeSnapshot();
+  }
+
+  unsubscribeSnapshot = onSnapshot(userRef, async (snap)=>{
+    if(!snap.exists()) return;
+    const data = snap.data();
+    if(data.status === "blocked"){
+      alert("Tài khoản của bạn đã bị khóa!");
+      await signOut(auth);
+      window.location.href="index.html";
+    }
+  });
+
+  document.getElementById("avatar").src = user.photoURL || "https://i.pravatar.cc/150";
+  document.getElementById("name").textContent = user.displayName || "Student";
+  document.getElementById("email").textContent = user.email || "Không có email";
+
+  const userEmail = user.email ? user.email.trim().toLowerCase() : "";
+
+  if(userEmail) {
+      loadData(userEmail);
+      checkLibraryCard(userEmail);
+  } else {
+      document.getElementById("loading-card").innerHTML = "<p style='color:red;'>Tài khoản của bạn không được liên kết với Email nên không thể tra cứu thẻ.</p>";
+  }
+});
+
+
+// ================= HÀM GIẢI MÃ CSV CHUẨN XÁC =================
+function parseCSV(str) {
+    const result = [];
+    let row = [];
+    let col = '';
+    let inQuotes = false;
+    for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+        const nextChar = str[i + 1];
+        if (char === '"') {
+            if (inQuotes && nextChar === '"') {
+                col += '"';
+                i++;
+            } else {
+                inQuotes = !inQuotes;
+            }
+        } else if (char === ',' && !inQuotes) {
+            row.push(col);
+            col = '';
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+            if (char === '\r' && nextChar === '\n') i++;
+            row.push(col);
+            result.push(row);
+            row = [];
+            col = '';
+        } else {
+            col += char;
+        }
+    }
+    if (col !== '' || row.length > 0) {
+        row.push(col);
+        result.push(row);
+    }
+    return result;
+}
+
+// ================= HÀM TÌM CỘT THÔNG MINH TUYỆT ĐỐI (FIX LỖI BẮT NHẦM CỘT) =================
+const getColIndex = (headers, keywords) => {
+    const lowerHeaders = headers.map(h => h.toLowerCase().trim());
+    
+    // Ưu tiên 1: Khớp chính xác hoàn toàn (Ví dụ: đúng chữ "Trạng thái" hoặc "Email")
+    for (const kw of keywords) {
+        const idx = lowerHeaders.indexOf(kw.toLowerCase());
+        if (idx !== -1) return idx;
+    }
+    
+    // Ưu tiên 2: Cột bắt đầu bằng từ khóa (Tránh bắt nhầm các cột rác nằm trước)
+    for (const kw of keywords) {
+        for (let i = 0; i < lowerHeaders.length; i++) {
+            if (lowerHeaders[i].startsWith(kw.toLowerCase())) return i;
+        }
+    }
+
+    // Ưu tiên 3: Chứa từ khóa
+    for (const kw of keywords) {
+        for (let i = 0; i < lowerHeaders.length; i++) {
+            if (lowerHeaders[i].includes(kw.toLowerCase())) return i;
+        }
+    }
+    return -1;
+};
+
+// ================= LOAD GOOGLE SHEET =================
+async function loadData(userEmail){
+  try {
+    let csvText = "";
+    
+    // FETCH CSV CÓ BỘ LỌC CHỐNG LỖI MẠNG GIỐNG ADMIN
+    try {
+        const res = await fetch(SHEET_URL);
+        if (res.ok) { csvText = await res.text(); } else { throw new Error("Direct fetch failed"); }
+    } catch (e1) {
+        try {
+            const proxyUrl1 = `https://corsproxy.io/?` + encodeURIComponent(SHEET_URL);
+            const response1 = await fetch(proxyUrl1);
+            if (response1.ok) { csvText = await response1.text(); } else { throw new Error("Proxy 1 failed"); }
+        } catch (e2) {
+            const proxyUrl2 = `https://api.allorigins.win/raw?url=${encodeURIComponent(SHEET_URL)}`;
+            const response2 = await fetch(proxyUrl2);
+            if (response2.ok) { csvText = await response2.text(); } else { throw new Error("All methods failed"); }
+        }
+    }
+    
+    const rows = parseCSV(csvText);
+    if (rows.length === 0) return;
+
+    // Lấy tiêu đề và tìm vị trí cột - LƯU Ý ĐÃ XOÁ CHỮ "GHI CHÚ"
+    const headers = rows[0];
+    const idxEmail = getColIndex(headers, ["địa chỉ email", "email", "mail"]);
+    const idxBook1 = getColIndex(headers, ["cuốn thứ nhất", "sách 1", "tên sách", "book 1"]);
+    const idxBook2 = getColIndex(headers, ["cuốn thứ hai", "sách 2", "book 2"]);
+    const idxBook3 = getColIndex(headers, ["cuốn thứ ba", "sách 3", "book 3"]);
+    const idxReturnDate = getColIndex(headers, ["ngày trả", "hạn trả"]);
+    
+    // Tuyệt đối không để chữ "ghi chú" ở đây, tránh việc hàm bắt nhầm cột Ghi chú rồi bỏ qua Trạng thái
+    const idxStatus = getColIndex(headers, ["trạng thái", "status", "tình trạng"]);
+
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const borrowList = document.getElementById("borrowList");
+    const overdueList = document.getElementById("overdueList");
+    const historyList = document.getElementById("historyList");
+
+    borrowList.innerHTML="";
+    overdueList.innerHTML="";
+    historyList.innerHTML="";
+
+    let borrowCount=0, overdueCount=0, historyCount=0;
+
+    // Lọc danh sách khớp email
+    const userRows = rows.slice(1).filter(row =>
+      idxEmail !== -1 && row[idxEmail] && row[idxEmail].trim().toLowerCase() === userEmail
+    );
+
+    userRows.forEach(row=>{
+      const b1 = idxBook1 !== -1 && row[idxBook1] ? row[idxBook1].trim() : "";
+      const b2 = idxBook2 !== -1 && row[idxBook2] ? row[idxBook2].trim() : "";
+      const b3 = idxBook3 !== -1 && row[idxBook3] ? row[idxBook3].trim() : "";
+      
+      const books = [b1, b2, b3].filter(b => b !== "");
+      const returnDateRaw = (idxReturnDate !== -1 && row[idxReturnDate]) ? row[idxReturnDate].trim() : "";
+
+      let isReturned = false;
+
+      // XÁC ĐỊNH TRẠNG THÁI (Đã trỏ chính xác vào cột Trạng thái)
+      if (idxStatus !== -1 && row[idxStatus]) {
+          let s = row[idxStatus].trim().toLowerCase();
+          let sNoMark = s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          
+          if (sNoMark.includes("da tra") || sNoMark === "xong" || sNoMark === "ok" || s.includes("đã trả") || s.includes("✅")) {
+              isReturned = true;
+          }
+          // Chống nhận diện nhầm nếu thủ thư ghi chữ "Chưa trả" hoặc "Đang mượn"
+          if (sNoMark.includes("dang muon") || sNoMark.includes("chua tra")) {
+              isReturned = false;
+          }
+      }
+
+      let finalStatus = "Đang mượn";
+
+      // Phân loại trạng thái cuối cùng
+      if (isReturned) {
+          finalStatus = "Đã trả xong";
+      } else if (returnDateRaw) {
+          // Xử lý đổi dấu "-" thành "/" để ngày tháng không bị lỗi
+          const parts = returnDateRaw.replace(/-/g, "/").split("/");
+          if (parts.length >= 3) {
+              const due = new Date(parts[2], parts[1]-1, parts[0]);
+              if (today > due) {
+                  finalStatus = "Quá hạn";
+              }
+          }
+      }
+
+      // Tạo thẻ giao diện
+      books.forEach(book=>{
+        const card = document.createElement("div");
+        card.className="card";
+
+        if(finalStatus === "Đang mượn"){
+          card.classList.add("borrowing");
+          card.innerHTML=`
+            <strong>${book}</strong>
+            <div>Hạn trả: ${returnDateRaw || "Không có"}</div>
+            <div>Trạng thái: ${finalStatus}</div>
+          `;
+          borrowList.appendChild(card);
+          borrowCount++;
+        }
+        else if(finalStatus === "Quá hạn"){
+          card.classList.add("overdue");
+          card.innerHTML=`
+            <strong>${book}</strong>
+            <div>Hạn trả: ${returnDateRaw || "Không có"}</div>
+            <div>Trạng thái: ${finalStatus}</div>
+          `;
+          overdueList.appendChild(card);
+          overdueCount++;
+        }
+        else { // "Đã trả xong" - Thêm vào lịch sử mượn
+          card.classList.add("returned");
+          card.innerHTML=`
+            <strong>${book}</strong>
+            <div>Hạn trả: ${returnDateRaw || "Không có"}</div>
+            <div>Trạng thái: ${finalStatus}</div>
+          `;
+          historyList.appendChild(card);
+          historyCount++;
+        }
+      });
+    });
+
+    document.getElementById("borrowCount").textContent=borrowCount;
+    document.getElementById("overdueCount").textContent=overdueCount;
+    document.getElementById("historyCount").textContent=historyCount;
+  } catch (err) {
+    console.error("Lỗi khi tải dữ liệu sách từ Sheet:", err);
+  }
+}
+
+// ================= KIỂM TRA THẺ THƯ VIỆN =================
+async function checkLibraryCard(userEmail) {
+  const loadingCard = document.getElementById("loading-card");
+  const hasCardView = document.getElementById("has-card-view");
+  const noCardView = document.getElementById("no-card-view");
+  
+  try {
+    let cardData = null;
+    let cardRole = "";
+    let cardId = "";
+
+    // Dùng cardDb thay vì db để đọc dữ liệu từ project thuvien-44050
+    const studentsRef = collection(cardDb, "students");
+    const qStudent = query(studentsRef, where("email", "==", userEmail));
+    const studentSnap = await getDocs(qStudent);
+
+    if (!studentSnap.empty) {
+      cardData = studentSnap.docs[0].data();
+      cardRole = `Học sinh ${cardData.class ? '- ' + cardData.class : ''}`;
+      cardId = cardData.studentId || studentSnap.docs[0].id;
+    } else {
+      const guestsRef = collection(cardDb, "guests");
+      const qGuest = query(guestsRef, where("email", "==", userEmail));
+      const guestSnap = await getDocs(qGuest);
+      
+      if (!guestSnap.empty) {
+        cardData = guestSnap.docs[0].data();
+        cardRole = "Khách ngoài trường";
+        cardId = guestSnap.docs[0].id;
+      }
+    }
+
+    loadingCard.style.display = "none";
+
+    if (cardData) {
+      document.getElementById("my-card-name").textContent = cardData.name || "Chưa cập nhật tên";
+      document.getElementById("my-card-role").textContent = cardRole;
+      document.getElementById("my-card-id").textContent = cardId;
+      document.getElementById("my-card-email").textContent = cardData.email;
+      
+      hasCardView.style.display = "block";
+      noCardView.style.display = "none";
+    } else {
+      hasCardView.style.display = "none";
+      noCardView.style.display = "block";
+    }
+    
+  } catch (error) {
+    console.error("Lỗi rớt khi tải thẻ thư viện:", error);
+    loadingCard.innerHTML = `
+        <p style='color:#ff3b30; font-weight:bold;'>Có lỗi quyền truy cập Firebase!</p>
+        <p style='font-size: 14px; margin-top:5px; color:#666;'>Bạn vui lòng mở Firebase project 'thuvien-44050', chỉnh sửa <b>Rules</b> của Firestore cho phép "allow read: if true;" để thẻ được hiển thị.</p>
+    `;
+  }
+}
+
+// ================= LOGOUT =================
+window.logout = async function(){
+  const user = auth.currentUser;
+  if(user){
+    await updateDoc(doc(db, "users", user.uid), {
+      online: false,
+      lastSeen: serverTimestamp()
+    });
+  }
+  await signOut(auth);
+  window.location.href="index.html"; 
+}
+
+// ================= TAB CLOSE (TỐI ƯU HÓA) =================
+window.addEventListener("beforeunload", () => {
+  const user = auth.currentUser;
+  if(user){
+    // Bỏ chữ "async/await" ở đây vì trình duyệt sẽ huỷ các lệnh await khi đóng tab
+    updateDoc(doc(db, "users", user.uid), {
+      online: false,
+      lastSeen: serverTimestamp()
+    }).catch(err => console.log(err));
+  }
+});
+
+// ================= NAV SWITCH =================
+window.showSection=function(id,btn){
+  document.querySelectorAll(".section").forEach(sec=>sec.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  btn.classList.add("active");
+}
+
+</script>
+
+</body>
+</html>

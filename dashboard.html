@@ -1,0 +1,457 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Thư Viện</title>
+    
+    <!-- React & Tailwind -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Fonts từ mẫu mới -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700&family=JetBrains+Mono:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                        digital: ['Share Tech Mono', 'monospace'],
+                    },
+                    colors: {
+                        neonBlue: '#0891b2',
+                        neonPurple: '#7c3aed',
+                        neonGreen: '#059669',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * { user-select: none; }
+        body { background-color: #f8fafc; color: #1e293b; font-family: 'Outfit', sans-serif; }
+        
+        /* Hiệu ứng Glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid #e2e8f0;
+            transition: 0.3s;
+        }
+        
+        .data-updated {
+            border-color: #0891b2;
+            box-shadow: 0 0 15px rgba(8, 145, 178, 0.2);
+        }
+
+        .animate-spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- CẤU HÌNH ---
+        const HARDCODED_CSV_LINK = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBheU1Zxps0sQ0DTdJtRzbaFE3Wm2g-vr8mO4GYKmr9raDtKET7xpOnnTcygnkkKGHwx7LzJBETL72/pub?output=csv";
+        const API_WRITE_URL = "https://script.google.com/macros/s/AKfycbwddY2WNVPUD_2R0XdbevIDLetWmIo0g--b-Sa2JkN8z96Pe-L8YCFlUsEpvBeAALVkcA/exec"; 
+
+        // --- ICONS ---
+        const Icon = ({ path, className }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{path}</svg>
+        );
+        const Icons={BookOpen:p=><Icon{...p}path={<><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></>}/>,Search:p=><Icon{...p}path={<><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></>}/>,Plus:p=><Icon{...p}path={<><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>}/>,RefreshCw:p=><Icon{...p}path={<><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></>}/>,Calendar:p=><Icon{...p}path={<><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></>}/>,CheckCircle:p=><Icon{...p}path={<><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></>}/>,XCircle:p=><Icon{...p}path={<><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></>}/>,Loader2:p=><Icon{...p}path={<><path d="M21 12a9 9 0 1 1-6.219-8.56"/></>}/>,Save:p=><Icon{...p}path={<><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></>}/>,Settings:p=><Icon{...p}path={<><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.47a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></>}/>,Undo2:p=><Icon{...p}path={<><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/></>}/>,Mail:p=><Icon{...p}path={<><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></>}/>};
+
+        // --- CSV PARSER ---
+        const parseCSV = (text) => {
+            const rows = [];
+            let currentRow = [];
+            let currentCell = "";
+            let inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                const nextChar = text[i + 1];
+                if (inQuotes) {
+                    if (char === '"' && nextChar === '"') { currentCell += '"'; i++; }
+                    else if (char === '"') { inQuotes = false; }
+                    else { currentCell += char; }
+                } else {
+                    if (char === '"') { inQuotes = true; }
+                    else if (char === ',') { currentRow.push(currentCell.trim()); currentCell = ""; }
+                    else if (char === '\n' || char === '\r') {
+                        if (currentCell || currentRow.length > 0) { currentRow.push(currentCell.trim()); rows.push(currentRow); }
+                        currentRow = []; currentCell = "";
+                        if (char === '\r' && nextChar === '\n') i++;
+                    } else { currentCell += char; }
+                }
+            }
+            if (currentCell || currentRow.length > 0) { currentRow.push(currentCell.trim()); rows.push(currentRow); }
+            return rows;
+        };
+
+        const getColIndex = (headers, names) => {
+            const lowerHeaders = headers.map(h => h.toLowerCase().trim());
+            for (const name of names) {
+                const idx = lowerHeaders.indexOf(name.toLowerCase());
+                if (idx !== -1) return idx;
+            }
+            return -1;
+        };
+
+        const LibraryApp = () => {
+            const [loans, setLoans] = useState([]);
+            const [searchTerm, setSearchTerm] = useState("");
+            const [loading, setLoading] = useState(false);
+            const [processingId, setProcessingId] = useState(null); 
+            const [filterStatus, setFilterStatus] = useState("All");
+            const [csvLink, setCsvLink] = useState(HARDCODED_CSV_LINK);
+            const [showSettings, setShowSettings] = useState(false);
+            
+            // State cho Đồng hồ
+            const [currentTime, setCurrentTime] = useState(new Date());
+
+            // Đồng hồ chạy mỗi giây
+            useEffect(() => {
+                const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+                return () => clearInterval(timer);
+            }, []);
+
+            useEffect(() => {
+                handleSync(true);
+            }, []);
+
+            // --- XỬ LÝ DỮ LIỆU ---
+            const handleSync = async (isAuto = false) => {
+                setLoading(true);
+                if (!csvLink) { setLoading(false); return; }
+
+                let csvText = "";
+                try {
+                    try {
+                        const response = await fetch(csvLink);
+                        if (response.ok) { csvText = await response.text(); } else { throw new Error("Direct fetch failed"); }
+                    } catch (e1) {
+                        try {
+                            const proxyUrl1 = `https://corsproxy.io/?` + encodeURIComponent(csvLink);
+                            const response1 = await fetch(proxyUrl1);
+                            if (response1.ok) { csvText = await response1.text(); } else { throw new Error("Proxy 1 failed"); }
+                        } catch (e2) {
+                            const proxyUrl2 = `https://api.allorigins.win/raw?url=${encodeURIComponent(csvLink)}`;
+                            const response2 = await fetch(proxyUrl2);
+                            if (response2.ok) { csvText = await response2.text(); } else { throw new Error("All methods failed"); }
+                        }
+                    }
+
+                    const rawData = parseCSV(csvText);
+                    if (rawData.length < 2) { if(!isAuto) alert("File CSV rỗng."); setLoading(false); return; }
+
+                    const headers = rawData[0];
+                    const idxTime = getColIndex(headers, ["dấu thời gian", "timestamp"]);
+                    const idxName = getColIndex(headers, ["họ và tên học sinh", "họ tên", "tên"]);
+                    const idxClass = getColIndex(headers, ["lớp"]);
+                    const idxPhone = getColIndex(headers, ["số điện thoại", "sđt", "phone"]);
+                    const idxEmail = getColIndex(headers, ["địa chỉ email", "email", "mail"]); // Tìm cột Email
+                    const idxReturnDate = getColIndex(headers, ["ngày trả", "hạn trả"]);
+                    const idxStatus = getColIndex(headers, ["trạng thái", "status"]);
+                    const idxID = getColIndex(headers, ["mã mượn", "id"]);
+                    const idxNote = getColIndex(headers, ["nhắc nhở qua email", "note", "ghi chú"]);
+                    const idxBook1 = getColIndex(headers, ["cuốn thứ nhất", "sách 1"]);
+                    const idxBook2 = getColIndex(headers, ["cuốn thứ hai", "sách 2"]);
+                    const idxBook3 = getColIndex(headers, ["cuốn thứ ba", "sách 3"]);
+
+                    const data = rawData.slice(1).map((row, idx) => {
+                        if (idxName === -1 || !row[idxName]) return null; 
+                        const books = [];
+                        if (idxBook1 !== -1 && row[idxBook1]) books.push(row[idxBook1]);
+                        if (idxBook2 !== -1 && row[idxBook2]) books.push(row[idxBook2]);
+                        if (idxBook3 !== -1 && row[idxBook3]) books.push(row[idxBook3]);
+                        
+                        let status = "Đang mượn";
+                        if (idxStatus !== -1 && row[idxStatus] && row[idxStatus].trim() !== "") {
+                            status = row[idxStatus].trim();
+                        }
+
+                        return {
+                            id: (idxID !== -1 && row[idxID]) ? row[idxID] : `ROW-${idx}`,
+                            timestamp: (idxTime !== -1) ? row[idxTime] : "",
+                            name: row[idxName],
+                            class: (idxClass !== -1) ? row[idxClass] : "",
+                            phone: (idxPhone !== -1) ? row[idxPhone] : "",
+                            email: (idxEmail !== -1) ? row[idxEmail] : "", // Lấy email
+                            books: books,
+                            returnDate: (idxReturnDate !== -1) ? row[idxReturnDate] : "",
+                            status: status,
+                            note: (idxNote !== -1) ? row[idxNote] : ""
+                        };
+                    }).filter(item => item !== null);
+
+                    setLoans(data);
+                    if (!isAuto) alert(`✅ Đã cập nhật ${data.length} dòng dữ liệu.`);
+
+                } catch (error) {
+                    console.error(error);
+                    if (!isAuto) alert(`❌ Lỗi tải dữ liệu.`);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const handleUpdateStatus = async (id, actionType) => {
+                if (!API_WRITE_URL) {
+                    alert("⚠️ Chưa cấu hình link Script ghi dữ liệu!");
+                    return;
+                }
+                setProcessingId(id); 
+                try {
+                    const response = await fetch(API_WRITE_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ id: id, action: actionType }),
+                        headers: { "Content-Type": "text/plain;charset=utf-8" },
+                    });
+                    setLoans(loans.map(loan => {
+                        if (loan.id === id) {
+                            return { ...loan, status: actionType === 'undo' ? "Đang mượn" : "Đã trả xong", note: "Vừa cập nhật" };
+                        }
+                        return loan;
+                    }));
+                } catch (error) {
+                    console.error(error);
+                    alert("❌ Có lỗi khi gửi lệnh.");
+                } finally {
+                    setProcessingId(null);
+                }
+            };
+
+            const filteredLoans = loans.filter(loan => {
+                const s = searchTerm.toLowerCase().trim();
+                const matchSearch = (loan.name && loan.name.toLowerCase().includes(s)) ||
+                                    (loan.class && loan.class.toLowerCase().includes(s)) ||
+                                    (loan.id && loan.id.toLowerCase().includes(s));
+                if (!matchSearch) return false;
+                const st = loan.status.toLowerCase();
+                if (filterStatus === "All") return true;
+                if (filterStatus === "Đang mượn") return st.includes("đang mượn");
+                if (filterStatus === "Đã trả xong") return st.includes("đã trả") || st.includes("trả xong");
+                if (filterStatus === "Quá hạn") return st.includes("quá hạn");
+                return true;
+            });
+
+            const getStatusColor = (statusRaw) => {
+                const s = statusRaw.toLowerCase();
+                if (s.includes("đã trả")) return "bg-green-100 text-green-700 border-green-200";
+                if (s.includes("quá hạn")) return "bg-red-100 text-red-700 border-red-200";
+                return "bg-yellow-100 text-yellow-800 border-yellow-200";
+            };
+
+            // Tính toán số liệu thống kê
+            const stats = {
+                total: loans.length,
+                active: loans.filter(l => l.status.toLowerCase().includes("đang mượn")).length,
+                returned: loans.filter(l => l.status.toLowerCase().includes("đã trả")).length,
+                overdue: loans.filter(l => l.status.toLowerCase().includes("quá hạn")).length
+            };
+
+            return (
+                <div className="p-6 font-sans">
+                    {/* --- HEADER MỚI --- */}
+                    <div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b pb-6">
+                        <div className="mb-4 md:mb-0">
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="relative flex h-3 w-3">
+                                    <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${loading ? 'bg-yellow-400' : 'bg-neonBlue'} opacity-75`}></span>
+                                    <span className={`relative inline-flex rounded-full h-3 w-3 ${loading ? 'bg-yellow-500' : 'bg-neonBlue'}`}></span>
+                                </span>
+                                <span className="text-neonBlue text-xs font-mono font-bold">
+                                    {loading ? 'UPDATING...' : 'REALTIME CONNECTED'}
+                                </span>
+                            </div>
+                            <h1 className="text-3xl font-bold">
+                                THƯ VIỆN SỐ <span className="text-transparent bg-clip-text bg-gradient-to-r from-neonBlue to-neonPurple">DASHBOARD</span>
+                            </h1>
+                        </div>
+
+                        <div className="flex items-center gap-6">
+                            <div className="flex gap-2">
+                                <button onClick={() => setShowSettings(!showSettings)} className="p-2 bg-white rounded-lg shadow border border-gray-200 hover:bg-gray-50 transition-colors" title="Cài đặt">
+                                    <Icons.Settings className="h-5 w-5 text-gray-500"/>
+                                </button>
+                                <button onClick={() => handleSync(false)} className="flex items-center gap-2 px-4 py-2 bg-neonBlue text-white rounded-lg shadow-lg shadow-cyan-500/30 hover:bg-cyan-600 transition-all font-medium">
+                                    {loading ? <Icons.Loader2 className="h-4 w-4 animate-spin"/> : <Icons.RefreshCw className="h-4 w-4"/>}
+                                    <span className="hidden sm:inline">Làm mới</span>
+                                </button>
+                            </div>
+                            <div className="hidden md:block text-right border-l pl-6 border-gray-200">
+                                <div className="text-xs font-mono text-slate-400 mb-1">System Time</div>
+                                <div className="text-4xl font-digital text-slate-700">{currentTime.toLocaleTimeString('vi-VN')}</div>
+                                <div className="text-xs font-mono text-slate-500 mt-1">{currentTime.toLocaleDateString('vi-VN')}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {showSettings && (
+                        <div className="bg-white border border-gray-200 p-4 mb-6 rounded-xl shadow-sm animate-in slide-in-from-top-2">
+                            <div className="flex gap-2">
+                                <input className="flex-1 border rounded p-2 text-sm" value={csvLink} onChange={e => setCsvLink(e.target.value)} placeholder="Link CSV..." />
+                                <button onClick={() => handleSync(false)} className="bg-slate-800 text-white px-4 py-2 rounded text-sm">Lưu</button>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* --- SCORECARDS MỚI --- */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div className="glass-panel p-6 rounded-xl relative overflow-hidden group hover:shadow-lg transition-all">
+                            <div className="absolute right-0 top-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><Icons.BookOpen className="h-16 w-16"/></div>
+                            <div className="text-xs font-mono text-slate-500 mb-2 font-bold tracking-wider">TỔNG LƯỢT MƯỢN</div>
+                            <div className="text-4xl font-bold font-mono text-slate-800">{stats.total}</div>
+                        </div>
+
+                        <div className="glass-panel p-6 rounded-xl border-l-4 border-l-yellow-400">
+                            <div className="text-xs font-mono text-slate-500 mb-2 font-bold tracking-wider">ĐANG MƯỢN</div>
+                            <div className="text-4xl font-bold font-mono text-yellow-600">{stats.active}</div>
+                        </div>
+
+                        <div className="glass-panel p-6 rounded-xl border-l-4 border-l-green-500">
+                            <div className="text-xs font-mono text-slate-500 mb-2 font-bold tracking-wider">ĐÃ TRẢ</div>
+                            <div className="flex items-end gap-2">
+                                <div className="text-4xl font-bold font-mono text-green-600">{stats.returned}</div>
+                                <div className="text-xs text-neonGreen font-mono mb-1 bg-green-50 px-1 rounded">
+                                    {stats.total > 0 ? Math.round((stats.returned / stats.total) * 100) : 0}%
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="glass-panel p-6 rounded-xl bg-red-50/50 border border-red-100">
+                            <div className="text-xs font-mono text-red-500 mb-2 font-bold tracking-wider">QUÁ HẠN</div>
+                            <div className="text-4xl font-bold font-mono text-red-600">{stats.overdue}</div>
+                        </div>
+                    </div>
+
+                    {/* --- BỘ LỌC & BẢNG (Giữ nguyên logic cũ nhưng style lại cho khớp) --- */}
+                    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                        <div className="p-4 border-b border-gray-100 flex flex-col md:flex-row gap-4 justify-between items-center bg-gray-50/50">
+                            <div className="relative w-full md:w-80">
+                                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><Icons.Search className="h-4 w-4"/></div>
+                                <input type="text" className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-neonBlue focus:border-transparent text-sm font-mono" placeholder="Tìm tên, lớp, mã..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
+                            </div>
+                            <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-1">
+                                {["All", "Đang mượn", "Đã trả xong", "Quá hạn"].map(st => (
+                                    <button key={st} onClick={() => setFilterStatus(st)} className={`px-4 py-1.5 text-xs font-bold font-mono rounded-full whitespace-nowrap transition-colors ${filterStatus === st ? "bg-slate-800 text-white" : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-100"}`}>
+                                        {st === "All" ? "TẤT CẢ" : st.toUpperCase()}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm min-w-[900px]">
+                                <thead className="bg-gray-50 text-gray-500 font-mono text-xs border-b">
+                                    <tr>
+                                        <th className="p-4 font-bold">THỜI GIAN / MÃ</th>
+                                        <th className="p-4 font-bold">HỌC SINH</th>
+                                        <th className="p-4 font-bold">SÁCH MƯỢN</th>
+                                        <th className="p-4 font-bold">HẠN TRẢ</th>
+                                        <th className="p-4 font-bold">TRẠNG THÁI</th>
+                                        <th className="p-4 font-bold text-right">THAO TÁC</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-gray-100 font-sans">
+                                    {filteredLoans.map(loan => (
+                                        <tr key={loan.id} className="hover:bg-slate-50 transition-colors group">
+                                            <td className="p-4 align-top">
+                                                <div className="text-slate-800 font-medium">{loan.timestamp.split(' ')[0]}</div>
+                                                <div className="text-xs text-slate-400 mt-1 font-mono bg-slate-100 inline-block px-1 rounded">{loan.id}</div>
+                                            </td>
+                                            <td className="p-4 align-top">
+                                                <div className="font-bold text-slate-700">{loan.name}</div>
+                                                <div className="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-2 font-mono">
+                                                    <span className="bg-slate-100 px-2 py-0.5 rounded">{loan.class}</span>
+                                                    {loan.phone && <span>{loan.phone}</span>}
+                                                </div>
+                                                {loan.email && (
+                                                    <div className="text-xs text-slate-400 mt-1 font-mono flex items-center gap-1">
+                                                        <Icons.Mail className="h-3 w-3" />
+                                                        {loan.email}
+                                                    </div>
+                                                )}
+                                            </td>
+                                            <td className="p-4 align-top">
+                                                <div className="flex flex-col gap-1.5">
+                                                    {loan.books.map((b, i) => (
+                                                        <div key={i} className="flex gap-2 items-start text-slate-600 text-sm">
+                                                            <Icons.BookOpen className="h-4 w-4 mt-0.5 text-neonBlue shrink-0"/>
+                                                            <span>{b}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </td>
+                                            <td className="p-4 align-top">
+                                                <div className="flex items-center gap-1.5 text-slate-600 font-medium font-mono text-xs">
+                                                    <Icons.Calendar className="h-4 w-4 text-slate-400"/>
+                                                    {loan.returnDate}
+                                                </div>
+                                            </td>
+                                            <td className="p-4 align-top">
+                                                <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold border ${getStatusColor(loan.status)}`}>
+                                                    {loan.status}
+                                                </span>
+                                                {loan.note && <div className="text-xs text-slate-400 mt-1 italic pl-1 border-l-2 border-slate-200 ml-1">{loan.note}</div>}
+                                            </td>
+                                            <td className="p-4 align-top text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    {!loan.status.toLowerCase().includes("đã trả") ? (
+                                                        <button 
+                                                            onClick={() => handleUpdateStatus(loan.id, 'return')}
+                                                            disabled={processingId === loan.id}
+                                                            className={`flex items-center gap-1 bg-white text-green-600 hover:bg-green-50 border border-green-200 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm ${processingId === loan.id ? "opacity-50 cursor-wait" : ""}`}
+                                                        >
+                                                            {processingId === loan.id ? <Icons.Loader2 className="h-4 w-4 animate-spin"/> : <Icons.CheckCircle className="h-4 w-4"/>} 
+                                                            TRẢ
+                                                        </button>
+                                                    ) : (
+                                                        <button 
+                                                            onClick={() => handleUpdateStatus(loan.id, 'undo')}
+                                                            disabled={processingId === loan.id}
+                                                            className={`p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-all ${processingId === loan.id ? "opacity-50" : ""}`}
+                                                            title="Hoàn tác"
+                                                        >
+                                                            {processingId === loan.id ? <Icons.Loader2 className="h-4 w-4 animate-spin"/> : <Icons.Undo2 className="h-5 w-5"/>} 
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                            {filteredLoans.length === 0 && (
+                                <div className="flex flex-col items-center justify-center h-48 text-slate-400">
+                                    <div className="bg-slate-50 p-4 rounded-full mb-3">
+                                        <Icons.BookOpen className="h-8 w-8 opacity-30"/>
+                                    </div>
+                                    <p className="font-mono text-sm">NO DATA FOUND</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<LibraryApp />);
+    </script>
+</body>
+</html>
