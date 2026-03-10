@@ -165,7 +165,7 @@
             
             <!-- TAB: TỔNG QUAN -->
             <div id="admin-tab-overview" class="admin-tab-content block">
-                <div class="max-w-6xl mx-auto">
+                <div class="max-w-7xl mx-auto">
                     <h2 class="text-2xl font-bold mb-6">Tổng quan Hệ thống</h2>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
@@ -189,20 +189,46 @@
                     </div>
 
                     <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-                        <div class="bg-white/70 rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                            <div class="bg-slate-50 px-6 py-4 border-b font-semibold text-indigo-800"><i class="fas fa-list mr-2"></i>Danh sách Học Sinh</div>
-                            <div class="overflow-y-auto max-h-[400px]">
+                        <div class="bg-white/70 rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                            <div class="bg-slate-50 px-6 py-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div class="font-semibold text-indigo-800 whitespace-nowrap"><i class="fas fa-list mr-2"></i>Danh sách Học Sinh</div>
+                                <div class="relative w-full sm:w-64">
+                                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                    <input type="text" id="searchStudentInput" class="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500" placeholder="Tìm tên, mã, email...">
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto overflow-y-auto max-h-[400px]">
                                 <table class="w-full text-sm text-left">
-                                    <thead class="bg-slate-100 text-slate-500 sticky top-0 z-10"><tr><th class="px-5 py-2">Mã HS</th><th class="px-5 py-2">Họ Tên</th></tr></thead>
+                                    <thead class="bg-slate-100 text-slate-500 sticky top-0 z-10">
+                                        <tr>
+                                            <th class="px-5 py-2 whitespace-nowrap">Mã HS</th>
+                                            <th class="px-5 py-2">Họ Tên</th>
+                                            <th class="px-5 py-2">Email</th>
+                                            <th class="px-5 py-2 text-right whitespace-nowrap">Thao tác</th>
+                                        </tr>
+                                    </thead>
                                     <tbody id="table-students"></tbody>
                                 </table>
                             </div>
                         </div>
-                        <div class="bg-white/70 rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                            <div class="bg-slate-50 px-6 py-4 border-b font-semibold text-emerald-800"><i class="fas fa-list mr-2"></i>Danh sách Khách Ngoài</div>
-                            <div class="overflow-y-auto max-h-[400px]">
+                        <div class="bg-white/70 rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                            <div class="bg-slate-50 px-6 py-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                                <div class="font-semibold text-emerald-800 whitespace-nowrap"><i class="fas fa-list mr-2"></i>Danh sách Khách Ngoài</div>
+                                <div class="relative w-full sm:w-64">
+                                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                    <input type="text" id="searchGuestInput" class="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-emerald-500" placeholder="Tìm tên, mã, email...">
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto overflow-y-auto max-h-[400px]">
                                 <table class="w-full text-sm text-left">
-                                    <thead class="bg-slate-100 text-slate-500 sticky top-0 z-10"><tr><th class="px-5 py-2">Mã Khách</th><th class="px-5 py-2">Họ Tên</th></tr></thead>
+                                    <thead class="bg-slate-100 text-slate-500 sticky top-0 z-10">
+                                        <tr>
+                                            <th class="px-5 py-2 whitespace-nowrap">Mã Khách</th>
+                                            <th class="px-5 py-2">Họ Tên</th>
+                                            <th class="px-5 py-2">Email</th>
+                                            <th class="px-5 py-2 text-right whitespace-nowrap">Thao tác</th>
+                                        </tr>
+                                    </thead>
                                     <tbody id="table-guests"></tbody>
                                 </table>
                             </div>
@@ -276,7 +302,8 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // CẬP NHẬT: Đã thêm getDoc vào import
+        import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc, query, orderBy, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // ================= APP 1: HỆ THỐNG QUẢN LÝ CHÍNH (Auth, User, Feedback) =================
         const firebaseConfig = {
@@ -302,7 +329,7 @@
             measurementId: "G-TMJB630SHL"
         };
         const cardApp = initializeApp(cardFirebaseConfig, "cardApp");
-        const cardDb = getFirestore(cardApp); // Sử dụng db này để lấy dữ liệu Thẻ
+        const cardDb = getFirestore(cardApp); 
 
         const ADMIN_UID = "idn9CUepaSOJOAL0Ag3ezSoQE4m1";
 
@@ -329,28 +356,177 @@
             if(tabId === 'admin-tab-feedback') loadFeedbackData();
         };
 
-        function loadAdminData() {
-            // Lấy dữ liệu học sinh từ dự án Thư Viện (cardDb)
-            onSnapshot(collection(cardDb, 'students'), (snap) => {
-                document.getElementById('admin-count-st').innerText = snap.size;
-                let html = ''; 
-                snap.forEach(d => { 
-                    const data = d.data();
-                    html += `<tr class="border-b hover:bg-slate-50 transition-colors"><td class="px-5 py-3 font-mono text-indigo-600 font-medium">${data.studentId || d.id}</td><td class="px-5 py-3">${data.name}</td></tr>`; 
-                });
-                document.getElementById('table-students').innerHTML = html || '<tr><td colspan="2" class="p-5 text-center text-slate-400">Chưa có dữ liệu</td></tr>';
+        // --- CÁC HÀM SỬA/XÓA THẺ THƯ VIỆN ---
+        window.editCard = async function(collectionName, currentId, currentName, currentEmail) {
+            const isStudent = collectionName === 'students';
+            const { value: formValues } = await Swal.fire({
+                title: isStudent ? 'Sửa thông tin Học sinh' : 'Sửa thông tin Khách',
+                html: `
+                    <div class="text-left mt-4">
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Mã ${isStudent ? 'Học sinh' : 'Khách'}:</label>
+                        <input id="swal-input-id" class="w-full px-4 py-2 border rounded-xl mb-4 bg-slate-50 focus:outline-none focus:border-indigo-500" value="${currentId}" ${isStudent ? '' : 'disabled title="Mã khách không thể sửa"'}>
+                        
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Họ Tên:</label>
+                        <input id="swal-input-name" class="w-full px-4 py-2 border rounded-xl mb-4 bg-slate-50 focus:outline-none focus:border-indigo-500" value="${currentName}">
+                        
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Email:</label>
+                        <input id="swal-input-email" type="email" class="w-full px-4 py-2 border rounded-xl mb-4 bg-slate-50 focus:outline-none focus:border-indigo-500" value="${currentEmail}">
+                    </div>
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonColor: '#4f46e5',
+                confirmButtonText: '<i class="fas fa-save mr-1"></i> Lưu thay đổi',
+                cancelButtonText: 'Hủy',
+                preConfirm: () => {
+                    return {
+                        newId: document.getElementById('swal-input-id').value.trim(),
+                        newName: document.getElementById('swal-input-name').value.trim(),
+                        newEmail: document.getElementById('swal-input-email').value.trim()
+                    }
+                }
             });
 
-            // Lấy dữ liệu khách từ dự án Thư Viện (cardDb)
+            if (formValues) {
+                if (!formValues.newName || !formValues.newId) return Swal.fire('Lỗi', 'Mã và Họ tên không được để trống!', 'error');
+
+                try {
+                    const docRef = doc(cardDb, collectionName, currentId);
+                    
+                    if (isStudent && formValues.newId !== currentId) {
+                        // Nếu sửa mã HS, phải tạo Document mới và xóa Document cũ
+                        const oldSnap = await getDoc(docRef);
+                        const oldData = oldSnap.exists() ? oldSnap.data() : {};
+                        const newData = { ...oldData, studentId: formValues.newId, name: formValues.newName, email: formValues.newEmail };
+                        
+                        await setDoc(doc(cardDb, collectionName, formValues.newId), newData);
+                        await deleteDoc(docRef);
+                    } else {
+                        // Cập nhật thông thường nếu không đổi ID
+                        await updateDoc(docRef, { name: formValues.newName, email: formValues.newEmail });
+                    }
+                    Swal.fire({title: 'Thành công!', text: 'Đã cập nhật thông tin.', icon: 'success', timer: 1500, showConfirmButton: false});
+                } catch (error) {
+                    Swal.fire('Lỗi!', error.message, 'error');
+                }
+            }
+        };
+
+        window.deleteCard = async function(collectionName, id) {
+            const result = await Swal.fire({
+                title: 'Xóa thẻ này?',
+                text: "Bạn không thể khôi phục lại dữ liệu sau khi xóa!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="fas fa-trash mr-1"></i> Xóa vĩnh viễn',
+                cancelButtonText: 'Hủy'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    await deleteDoc(doc(cardDb, collectionName, id));
+                    Swal.fire({title: 'Đã xóa!', text: 'Dữ liệu thẻ đã bị xóa.', icon: 'success', timer: 1500, showConfirmButton: false});
+                } catch (error) {
+                    Swal.fire('Lỗi!', error.message, 'error');
+                }
+            }
+        };
+        // ------------------------------------
+
+        function loadAdminData() {
+            let allStudentsData = [];
+            let allGuestsData = [];
+
+            // RENDER HỌC SINH
+            const renderStudents = (data) => {
+                let html = ''; 
+                data.forEach(d => { 
+                    const id = d.studentId || d.id;
+                    const safeName = d.name ? d.name.replace(/'/g, "\\'") : '';
+                    const safeEmail = d.email ? d.email.replace(/'/g, "\\'") : '';
+
+                    html += `
+                    <tr class="border-b hover:bg-slate-50 transition-colors">
+                        <td class="px-5 py-3 font-mono text-indigo-600 font-medium whitespace-nowrap">${id}</td>
+                        <td class="px-5 py-3 font-medium text-slate-700 min-w-[120px]">${d.name || ''}</td>
+                        <td class="px-5 py-3 text-slate-500 text-sm break-all min-w-[150px]">${d.email || '<span class="italic opacity-50">Chưa cập nhật</span>'}</td>
+                        <td class="px-5 py-3 text-right whitespace-nowrap">
+                            <button onclick="editCard('students', '${id}', '${safeName}', '${safeEmail}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-colors mx-1" title="Sửa thông tin">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteCard('students', '${id}')" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors mx-1" title="Xóa thẻ">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>`; 
+                });
+                document.getElementById('table-students').innerHTML = html || '<tr><td colspan="4" class="p-5 text-center text-slate-400">Chưa có dữ liệu</td></tr>';
+            };
+
+            // Lấy dữ liệu học sinh
+            onSnapshot(collection(cardDb, 'students'), (snap) => {
+                document.getElementById('admin-count-st').innerText = snap.size;
+                allStudentsData = [];
+                snap.forEach(d => { allStudentsData.push({ id: d.id, ...d.data() }); });
+                
+                const term = document.getElementById('searchStudentInput').value.toLowerCase().trim();
+                const filtered = term ? allStudentsData.filter(x => (x.name||'').toLowerCase().includes(term) || (x.studentId||x.id||'').toLowerCase().includes(term) || (x.email||'').toLowerCase().includes(term)) : allStudentsData;
+                renderStudents(filtered);
+            });
+
+            // TÌM KIẾM HỌC SINH
+            document.getElementById('searchStudentInput').addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase().trim();
+                const filtered = term ? allStudentsData.filter(x => (x.name||'').toLowerCase().includes(term) || (x.studentId||x.id||'').toLowerCase().includes(term) || (x.email||'').toLowerCase().includes(term)) : allStudentsData;
+                renderStudents(filtered);
+            });
+
+            // RENDER KHÁCH
+            const renderGuests = (data) => {
+                let html = ''; 
+                data.forEach(d => { 
+                    const id = d.id;
+                    const safeName = d.name ? d.name.replace(/'/g, "\\'") : '';
+                    const safeEmail = d.email ? d.email.replace(/'/g, "\\'") : '';
+
+                    html += `
+                    <tr class="border-b hover:bg-slate-50 transition-colors">
+                        <td class="px-5 py-3 font-mono text-emerald-600 font-medium whitespace-nowrap">${id}</td>
+                        <td class="px-5 py-3 font-medium text-slate-700 min-w-[120px]">${d.name || ''}</td>
+                        <td class="px-5 py-3 text-slate-500 text-sm break-all min-w-[150px]">${d.email || '<span class="italic opacity-50">Chưa cập nhật</span>'}</td>
+                        <td class="px-5 py-3 text-right whitespace-nowrap">
+                            <button onclick="editCard('guests', '${id}', '${safeName}', '${safeEmail}')" class="text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-colors mx-1" title="Sửa thông tin">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="deleteCard('guests', '${id}')" class="text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors mx-1" title="Xóa thẻ">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    </tr>`; 
+                });
+                document.getElementById('table-guests').innerHTML = html || '<tr><td colspan="4" class="p-5 text-center text-slate-400">Chưa có dữ liệu</td></tr>';
+            };
+
+            // Lấy dữ liệu khách 
             onSnapshot(collection(cardDb, 'guests'), (snap) => {
                 document.getElementById('admin-count-guest').innerText = snap.size;
-                let html = ''; 
-                snap.forEach(d => { 
-                    const data = d.data();
-                    html += `<tr class="border-b hover:bg-slate-50 transition-colors"><td class="px-5 py-3 font-mono text-emerald-600 font-medium">${d.id}</td><td class="px-5 py-3">${data.name}</td></tr>`; 
-                });
-                document.getElementById('table-guests').innerHTML = html || '<tr><td colspan="2" class="p-5 text-center text-slate-400">Chưa có dữ liệu</td></tr>';
+                allGuestsData = [];
+                snap.forEach(d => { allGuestsData.push({ id: d.id, ...d.data() }); });
+                
+                const term = document.getElementById('searchGuestInput').value.toLowerCase().trim();
+                const filtered = term ? allGuestsData.filter(x => (x.name||'').toLowerCase().includes(term) || (x.id||'').toLowerCase().includes(term) || (x.email||'').toLowerCase().includes(term)) : allGuestsData;
+                renderGuests(filtered);
             });
+
+            // TÌM KIẾM KHÁCH
+            document.getElementById('searchGuestInput').addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase().trim();
+                const filtered = term ? allGuestsData.filter(x => (x.name||'').toLowerCase().includes(term) || (x.id||'').toLowerCase().includes(term) || (x.email||'').toLowerCase().includes(term)) : allGuestsData;
+                renderGuests(filtered);
+            });
+
 
             // ================= QUẢN LÝ USER CÓ THỂ TÌM KIẾM (Dự án chính) =================
             let allUsersData = [];
