@@ -240,10 +240,20 @@
             <!-- TAB: FEEDBACK -->
             <div id="admin-tab-feedback" class="admin-tab-content hidden">
                 <div class="max-w-6xl mx-auto">
-                    <div class="flex justify-between items-center mb-6">
+                    <!-- Phần header đã sửa để thêm Dropdown bộ lọc -->
+                    <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
                         <h2 class="text-2xl font-bold text-slate-800">Quản lý Feedback</h2>
-                        <div class="bg-white px-4 py-2 rounded-full shadow-sm text-sm">Tổng: <span id="totalCount" class="text-indigo-600 font-bold">0</span></div>
+                        <div class="flex items-center gap-3">
+                            <select id="feedbackFilter" class="bg-white border border-slate-200 text-slate-700 text-sm rounded-full px-4 py-2 shadow-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 font-medium">
+                                <option value="all">Tất cả phân loại</option>
+                                <option value="bug">🐛 Bug (Báo lỗi)</option>
+                                <option value="suggestion">💡 Suggestion (Góp ý)</option>
+                                <option value="other">💬 Other (Khác)</option>
+                            </select>
+                            <div class="bg-white px-4 py-2 rounded-full shadow-sm text-sm border border-slate-100">Tổng: <span id="totalCount" class="text-indigo-600 font-bold">0</span></div>
+                        </div>
                     </div>
+
                     <div class="bg-white/70 rounded-2xl border overflow-hidden shadow-sm">
                         <div class="overflow-y-auto max-h-[calc(100vh-180px)]">
                             <table class="w-full text-sm text-left">
@@ -333,6 +343,9 @@
 
         const ADMIN_UID = "idn9CUepaSOJOAL0Ag3ezSoQE4m1";
 
+        // Mảng lưu trữ toàn bộ feedback để lọc
+        let allFeedbacks = [];
+
         // CHỜ XÁC NHẬN ĐĂNG NHẬP MỚI LOAD DỮ LIỆU
         onAuthStateChanged(auth, (user) => {
             if (user) {
@@ -394,7 +407,6 @@
                     const docRef = doc(cardDb, collectionName, currentId);
                     
                     if (isStudent && formValues.newId !== currentId) {
-                        // Nếu sửa mã HS, phải tạo Document mới và xóa Document cũ
                         const oldSnap = await getDoc(docRef);
                         const oldData = oldSnap.exists() ? oldSnap.data() : {};
                         const newData = { ...oldData, studentId: formValues.newId, name: formValues.newName, email: formValues.newEmail };
@@ -402,7 +414,6 @@
                         await setDoc(doc(cardDb, collectionName, formValues.newId), newData);
                         await deleteDoc(docRef);
                     } else {
-                        // Cập nhật thông thường nếu không đổi ID
                         await updateDoc(docRef, { name: formValues.newName, email: formValues.newEmail });
                     }
                     Swal.fire({title: 'Thành công!', text: 'Đã cập nhật thông tin.', icon: 'success', timer: 1500, showConfirmButton: false});
@@ -465,7 +476,6 @@
                 document.getElementById('table-students').innerHTML = html || '<tr><td colspan="4" class="p-5 text-center text-slate-400">Chưa có dữ liệu</td></tr>';
             };
 
-            // Lấy dữ liệu học sinh
             onSnapshot(collection(cardDb, 'students'), (snap) => {
                 document.getElementById('admin-count-st').innerText = snap.size;
                 allStudentsData = [];
@@ -476,7 +486,6 @@
                 renderStudents(filtered);
             });
 
-            // TÌM KIẾM HỌC SINH
             document.getElementById('searchStudentInput').addEventListener('input', (e) => {
                 const term = e.target.value.toLowerCase().trim();
                 const filtered = term ? allStudentsData.filter(x => (x.name||'').toLowerCase().includes(term) || (x.studentId||x.id||'').toLowerCase().includes(term) || (x.email||'').toLowerCase().includes(term)) : allStudentsData;
@@ -509,7 +518,6 @@
                 document.getElementById('table-guests').innerHTML = html || '<tr><td colspan="4" class="p-5 text-center text-slate-400">Chưa có dữ liệu</td></tr>';
             };
 
-            // Lấy dữ liệu khách 
             onSnapshot(collection(cardDb, 'guests'), (snap) => {
                 document.getElementById('admin-count-guest').innerText = snap.size;
                 allGuestsData = [];
@@ -520,15 +528,13 @@
                 renderGuests(filtered);
             });
 
-            // TÌM KIẾM KHÁCH
             document.getElementById('searchGuestInput').addEventListener('input', (e) => {
                 const term = e.target.value.toLowerCase().trim();
                 const filtered = term ? allGuestsData.filter(x => (x.name||'').toLowerCase().includes(term) || (x.id||'').toLowerCase().includes(term) || (x.email||'').toLowerCase().includes(term)) : allGuestsData;
                 renderGuests(filtered);
             });
 
-
-            // ================= QUẢN LÝ USER CÓ THỂ TÌM KIẾM (Dự án chính) =================
+            // ================= QUẢN LÝ USER =================
             let allUsersData = [];
 
             const renderUserTable = (dataToRender) => {
@@ -583,45 +589,77 @@
             });
         }
 
-        // ================= XỬ LÝ FEEDBACK =================
+        // ================= XỬ LÝ FEEDBACK VỚI BỘ LỌC =================
+        
+        // 1. Hàm chỉ tải dữ liệu từ Firebase 1 lần
         async function loadFeedbackData() {
             try {
                 const q = query(collection(db, "feedback"), orderBy("createdAt", "desc"));
                 const snapshot = await getDocs(q);
                 
-                document.getElementById('totalCount').innerText = snapshot.size;
-                let html = '';
-
+                allFeedbacks = []; // Làm trống mảng
                 snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    let badgeClass = "other";
-                    if(data.type === "bug") badgeClass = "bug";
-                    else if(data.type === "suggestion") badgeClass = "suggestion";
-
-                    html += `
-                        <tr class="border-b hover:bg-slate-50 transition-colors">
-                            <td class="px-5 py-4 font-medium text-slate-800">${data.name || 'Ẩn danh'}</td>
-                            <td class="px-5 py-4 text-xs text-slate-500">
-                                <div class="font-mono">${data.email || 'Không có email'}</div>
-                                <div class="mt-1"><span class="bg-slate-100 px-2 py-0.5 rounded">${data.class || 'N/A'}</span></div>
-                            </td>
-                            <td class="px-5 py-4"><span class="badge ${badgeClass}">${data.type || 'Khác'}</span></td>
-                            <td class="px-5 py-4 text-slate-700">${data.content || ''}</td>
-                            <td class="px-5 py-4 text-center">
-                                <button onclick="deleteFeedback('${docSnap.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Xoá Feedback">
-                                    <i class="fas fa-trash-alt text-lg"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
+                    allFeedbacks.push({ id: docSnap.id, ...docSnap.data() });
                 });
+
+                // Lấy giá trị filter hiện tại từ dropdown và render
+                const currentFilter = document.getElementById('feedbackFilter').value;
+                renderFeedbackTable(currentFilter);
                 
-                document.getElementById('feedbackTable').innerHTML = html || '<tr><td colspan="5" class="p-5 text-center text-slate-400">Chưa có feedback nào</td></tr>';
             } catch (error) {
                 console.error("Lỗi khi tải Feedback: ", error);
                 document.getElementById('feedbackTable').innerHTML = `<tr><td colspan="5" class="p-5 text-center text-red-500">Không thể tải dữ liệu: ${error.message}</td></tr>`;
             }
         }
+
+        // 2. Hàm lọc dữ liệu và in ra màn hình
+        function renderFeedbackTable(filterType) {
+            let filteredData = allFeedbacks;
+
+            // Nếu người dùng chọn filter khác "all", tiến hành lọc mảng
+            if (filterType !== 'all') {
+                filteredData = allFeedbacks.filter(fb => {
+                    const type = fb.type ? fb.type.toLowerCase() : 'other';
+                    return type === filterType;
+                });
+            }
+
+            // Cập nhật số lượng
+            document.getElementById('totalCount').innerText = filteredData.length;
+            
+            let html = '';
+            filteredData.forEach(data => {
+                let badgeClass = "other";
+                let typeText = data.type || "other";
+
+                if(typeText.toLowerCase() === "bug") badgeClass = "bug";
+                else if(typeText.toLowerCase() === "suggestion") badgeClass = "suggestion";
+
+                html += `
+                    <tr class="border-b hover:bg-slate-50 transition-colors">
+                        <td class="px-5 py-4 font-medium text-slate-800">${data.name || 'Ẩn danh'}</td>
+                        <td class="px-5 py-4 text-xs text-slate-500">
+                            <div class="font-mono">${data.email || 'Không có email'}</div>
+                            <div class="mt-1"><span class="bg-slate-100 px-2 py-0.5 rounded">${data.class || 'N/A'}</span></div>
+                        </td>
+                        <td class="px-5 py-4"><span class="badge ${badgeClass}">${typeText}</span></td>
+                        <td class="px-5 py-4 text-slate-700">${data.content || ''}</td>
+                        <td class="px-5 py-4 text-center">
+                            <button onclick="deleteFeedback('${data.id}')" class="text-red-400 hover:text-red-600 hover:bg-red-50 p-2 rounded-lg transition-colors" title="Xoá Feedback">
+                                <i class="fas fa-trash-alt text-lg"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            document.getElementById('feedbackTable').innerHTML = html || '<tr><td colspan="5" class="p-5 text-center text-slate-400">Không có phản hồi nào phù hợp</td></tr>';
+        }
+
+        // Lắng nghe sự kiện khi người dùng đổi lựa chọn trong Select
+        document.getElementById('feedbackFilter').addEventListener('change', function(e) {
+            renderFeedbackTable(e.target.value);
+        });
 
         window.deleteFeedback = async function(id) {
             const result = await Swal.fire({
@@ -638,7 +676,7 @@
                 try {
                     await deleteDoc(doc(db, "feedback", id)); 
                     Swal.fire("Đã xoá!", "", "success");
-                    loadFeedbackData();
+                    loadFeedbackData(); // Tải lại data sau khi xoá
                 } catch(e) {
                     Swal.fire("Lỗi", "Không thể xoá", "error");
                 }
@@ -677,7 +715,6 @@
                             const className = cols[2].trim();
                             
                             if (studentId && name) {
-                                // Thay vì lưu ở db cũ, giờ sẽ Import tạo thẳng thẻ thư viện trên cardDb!
                                 await setDoc(doc(cardDb, 'students', studentId), { studentId, name, class: className }); 
                                 count++;
                             }
