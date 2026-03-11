@@ -122,6 +122,7 @@ body{
   display:flex;
   flex-direction:column;
   overflow:hidden;
+  position: relative; /* Dùng để canh vị trí Giỏ hàng */
 }
 
 /* ================= SECTION ================= */
@@ -212,7 +213,7 @@ body{
   align-content: start;
 }
 
-/* ================= CATALOG (TRA CỨU SÁCH) - NEW UI ================= */
+/* ================= CATALOG (TRA CỨU SÁCH) ================= */
 .catalog-controls {
   display: flex;
   gap: 15px;
@@ -291,6 +292,7 @@ body{
   flex: 1;
   overflow-y: auto;
   padding-right: 10px;
+  padding-bottom: 80px; /* Nhường chỗ cho Giỏ hàng nổi ở dưới */
 }
 
 .list-item {
@@ -344,13 +346,12 @@ body{
   font-size: 16px;
 }
 
-/* NÚT MƯỢN ĐÃ ĐƯỢC CHUYỂN THÀNH BUTTON ĐỂ XỬ LÝ JS */
+/* ================= NÚT GIỎ HÀNG ================= */
 .btn-borrow {
-  padding: 8px 20px;
+  padding: 8px 16px;
   border-radius: 8px;
   font-weight: bold;
-  text-decoration: none;
-  font-size: 14px;
+  font-size: 13px;
   display: inline-block;
   transition: 0.2s;
   border: none;
@@ -359,16 +360,27 @@ body{
   outline: none;
 }
 
-.btn-borrow.available {
-  background: #20c997;
+.btn-borrow.add {
+  background: #3b82f6; 
   color: white;
-  box-shadow: 0 4px 10px rgba(32, 201, 151, 0.3);
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
 }
 
-.btn-borrow.available:hover {
-  background: #1ba87e;
+.btn-borrow.add:hover {
+  background: #2563eb;
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(32, 201, 151, 0.4);
+  box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+}
+
+.btn-borrow.remove {
+  background: #f87171; 
+  color: white;
+  box-shadow: 0 4px 10px rgba(248, 113, 113, 0.3);
+}
+
+.btn-borrow.remove:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
 }
 
 .btn-borrow.unavailable {
@@ -378,29 +390,78 @@ body{
   pointer-events: none;
 }
 
-/* ================= DIGITAL CARD ================= */
-.digital-card-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 30px 10px;
-}
-.digital-card {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  width: 100%;
-  max-width: 380px;
+/* ================= THANH GIỎ HÀNG NỔI (FLOATING CART) ================= */
+.floating-cart {
+  position: absolute;
+  bottom: -100px; 
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(25px);
+  padding: 15px 25px;
   border-radius: 20px;
-  padding: 25px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-  position: relative;
-  overflow: hidden;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+  border: 1px solid rgba(255,255,255,0.8);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 100;
+  width: max-content;
+  max-width: 90%;
 }
-.digital-card::before {
-  content: ''; position: absolute; width: 200px; height: 200px;
-  background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-  top: -100px; right: -100px;
+
+.floating-cart.show {
+  bottom: 30px; 
 }
+
+.cart-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.cart-title {
+  font-size: 13px;
+  color: #666;
+  font-weight: 600;
+}
+
+.cart-count {
+  font-size: 20px;
+  font-weight: 800;
+  color: #222;
+}
+
+.cart-count span {
+  color: #3b82f6;
+}
+
+.btn-checkout {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-checkout:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(16, 185, 129, 0.4);
+}
+
+
+/* ================= DIGITAL CARD ================= */
+.digital-card-wrapper { display: flex; justify-content: center; align-items: center; padding: 30px 10px; }
+.digital-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; width: 100%; max-width: 380px; border-radius: 20px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); position: relative; overflow: hidden; }
+.digital-card::before { content: ''; position: absolute; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%); top: -100px; right: -100px; }
 .card-content { position: relative; z-index: 2; }
 .card-header-top { display: flex; justify-content: space-between; margin-bottom: 25px; }
 .card-brand { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.8; font-weight: bold; }
@@ -423,13 +484,14 @@ body{
 /* ================= FADE ================= */
 @keyframes fadeIn{ from{ opacity:0; transform:translateY(12px); } to{ opacity:1; transform:translateY(0); } }
 
-/* Responsive adjustments for Catalog */
+/* Responsive */
 @media (max-width: 900px) {
     .list-header { display: none; }
     .list-item { flex-direction: column; align-items: flex-start; gap: 10px; position: relative; padding-bottom: 60px;}
     .list-col-code, .list-col-info, .list-col-cat, .list-col-stock { width: 100%; text-align: left; }
     .list-col-action { width: 100%; position: absolute; bottom: 15px; left: 20px; text-align: left; }
     .list-col-stock::before { content: 'Còn lại: '; font-weight: normal; color: #777;}
+    .floating-cart { flex-direction: column; gap: 10px; width: 90%; text-align: center; }
 }
 </style>
 </head>
@@ -467,7 +529,7 @@ body{
     </div>
   </div>
 
-  <!-- TRA CỨU MƯỢN SÁCH (NEW UI) -->
+  <!-- TRA CỨU MƯỢN SÁCH (CÓ GIỎ HÀNG) -->
   <div id="catalog" class="section">
     <h2 style="margin-bottom: 20px; color: #333; display: flex; justify-content: space-between; align-items: center;">
       <span>Tra cứu & Mượn sách</span>
@@ -481,7 +543,6 @@ body{
       <div class="filter-box">
         <select id="categoryFilter" onchange="filterCatalog()">
           <option value="all">📚 Tất cả thể loại</option>
-          <!-- Các thể loại sẽ được thêm tự động bằng code JS -->
         </select>
       </div>
     </div>
@@ -501,6 +562,18 @@ body{
 
     <!-- Danh sách sách -->
     <div id="bookCatalog"></div>
+
+    <!-- THANH GIỎ HÀNG NỔI Ở ĐÁY MÀN HÌNH -->
+    <div id="floatingCart" class="floating-cart">
+        <div class="cart-info">
+            <span class="cart-title">Đã chọn vào giỏ</span>
+            <div class="cart-count"><span id="cartCountNum">0</span> / 3 cuốn</div>
+        </div>
+        <button class="btn-checkout" onclick="checkoutCart()">
+            🛒 Tiến hành đăng ký
+        </button>
+    </div>
+
   </div>
 
   <!-- TRANG LỊCH SỬ -->
@@ -594,14 +667,21 @@ const SHEET_KHO_SACH_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBh
 // ================= MÃ ENTRY ĐIỀN FORM TỰ ĐỘNG =================
 const ENTRY_HO_TEN = "entry.500506778"; 
 const ENTRY_MA_THE = "entry.266807010"; 
-const ENTRY_EMAIL  = "emailAddress"; // Chuẩn của Google Form thu thập Email mặc định
+const ENTRY_EMAIL  = "emailAddress"; 
+const ENTRY_LOP    = "entry.1866897768"; 
+
+const ENTRY_SACH_1 = "entry.1587371852"; 
+const ENTRY_SACH_2 = "entry.317621815"; 
+const ENTRY_SACH_3 = "entry.844808421"; 
+
 
 let unsubscribeSnapshot = null;
 let allCatalogBooks = []; 
-
-// LƯU TRỮ TOÀN BỘ THÔNG TIN THẺ CỦA USER ĐỂ ĐIỀN FORM
 window.userLibraryData = null;
 window.hasCheckedCard = false;
+
+// BIẾN LƯU TRỮ GIỎ SÁCH CỦA HỌC SINH
+window.cart = []; // Chứa tối đa 3 object sách
 
 // ================= AUTH =================
 onAuthStateChanged(auth, async (user)=>{
@@ -802,7 +882,7 @@ async function loadCatalog(isSilent = false) {
       if (idxTenSach === -1 || !row[idxTenSach]) continue;
 
       const maSach = idxMaSach !== -1 ? row[idxMaSach].trim() : `S${i}`;
-      const tenSach = row[idxTenSach].trim();
+      const tenSach = row[idxTenSach].trim(); // FULL TÊN (BAO GỒM TÁC GIẢ) DÙNG CHO FORM
       const phanLoai = idxPhanLoai !== -1 ? row[idxPhanLoai].trim() : "Khác";
       const conLai = idxConLai !== -1 ? parseInt(row[idxConLai]) || 0 : 0;
 
@@ -817,12 +897,24 @@ async function loadCatalog(isSilent = false) {
       if(phanLoai) uniqueCategories.add(phanLoai);
 
       const bookObj = {
-          maSach, titleOnly, authorName, phanLoai, conLai,
+          maSach, 
+          titleOnly, 
+          authorName, 
+          fullTitle: tenSach, // LƯU LẠI TÊN ĐẦY ĐỦ ĐỂ ĐIỀN FORM
+          phanLoai, 
+          conLai,
           searchText: `${maSach} ${tenSach}`.toLowerCase(),
           isAvailable: conLai > 0
       };
       allCatalogBooks.push(bookObj);
     }
+
+    // Tự động gỡ những sách trong giỏ nếu sách đó vừa bị người khác mượn hết số lượng
+    window.cart = window.cart.filter(cartBook => {
+        const bookInDb = allCatalogBooks.find(b => b.maSach === cartBook.maSach);
+        return bookInDb && bookInDb.isAvailable;
+    });
+    updateCartUI();
 
     const currentSelectedCat = filterSelect.value;
     filterSelect.innerHTML = '<option value="all">📚 Tất cả thể loại</option>';
@@ -857,8 +949,27 @@ function renderCatalog(books) {
     }
 
     books.forEach(b => {
+      // KIỂM TRA XEM SÁCH ĐÃ CÓ TRONG GIỎ CHƯA
+      const isInCart = window.cart.some(cartBook => cartBook.maSach === b.maSach);
+      const isCartFull = window.cart.length >= 3;
+      
+      let btnHTML = "";
+
+      if (b.isAvailable) {
+          if (isInCart) {
+              btnHTML = `<button onclick="toggleCart('${b.maSach}', '${b.fullTitle.replace(/'/g, "\\'")}')" class="btn-borrow remove">❌ Bỏ chọn</button>`;
+          } else if (isCartFull) {
+               btnHTML = `<button class="btn-borrow unavailable">Giỏ đã đầy</button>`;
+          } else {
+               btnHTML = `<button onclick="toggleCart('${b.maSach}', '${b.fullTitle.replace(/'/g, "\\'")}')" class="btn-borrow add">➕ Thêm vào giỏ</button>`;
+          }
+      } else {
+          btnHTML = `<button class="btn-borrow unavailable">Hết sách</button>`;
+      }
+
       const item = document.createElement("div");
       item.className = "list-item";
+      if (isInCart) item.style.border = "1px solid #3b82f6"; // Highlight viền sách đã chọn
       
       item.innerHTML = `
         <div class="list-col-code">${b.maSach}</div>
@@ -876,10 +987,7 @@ function renderCatalog(books) {
           ${b.conLai}
         </div>
         <div class="list-col-action">
-          <button onclick="borrowBook(${b.isAvailable})" 
-             class="btn-borrow ${b.isAvailable ? 'available' : 'unavailable'}">
-            ${b.isAvailable ? 'Mượn' : 'Hết sách'}
-          </button>
+          ${btnHTML}
         </div>
       `;
       catalogDiv.appendChild(item);
@@ -899,9 +1007,41 @@ window.filterCatalog = function() {
     renderCatalog(filtered);
 }
 
-// ================= HÀM XỬ LÝ NÚT MƯỢN SÁCH TỰ ĐỘNG ĐIỀN FORM =================
-window.borrowBook = function(isAvailable) {
-    if (!isAvailable) return;
+// ================= HÀM XỬ LÝ GIỎ HÀNG (THÊM / BỚT) =================
+window.toggleCart = function(maSach, fullTitle) {
+    const existingIndex = window.cart.findIndex(b => b.maSach === maSach);
+    
+    if (existingIndex > -1) {
+        // Đã có trong giỏ -> Xóa ra
+        window.cart.splice(existingIndex, 1);
+    } else {
+        // Chưa có trong giỏ -> Kiểm tra full chưa rồi Thêm vào
+        if (window.cart.length < 3) {
+            window.cart.push({ maSach, fullTitle });
+        }
+    }
+    
+    // Cập nhật lại UI Danh sách và Giỏ hàng
+    filterCatalog();
+    updateCartUI();
+}
+
+function updateCartUI() {
+    const cartEl = document.getElementById("floatingCart");
+    const countEl = document.getElementById("cartCountNum");
+    
+    countEl.textContent = window.cart.length;
+    
+    if (window.cart.length > 0) {
+        cartEl.classList.add("show");
+    } else {
+        cartEl.classList.remove("show");
+    }
+}
+
+// ================= HÀM CHỐT ĐƠN (TIẾN HÀNH ĐĂNG KÝ) =================
+window.checkoutCart = function() {
+    if (window.cart.length === 0) return;
 
     if (!window.hasCheckedCard) {
         alert("Đang tải dữ liệu thẻ từ hệ thống, vui lòng đợi vài giây...");
@@ -917,18 +1057,27 @@ window.borrowBook = function(isAvailable) {
     let finalUrl = FORM_MUON_SACH_URL;
     let params = new URLSearchParams();
 
-    // Điền Họ Tên, Mã Thẻ và Email
+    // Điền Thông tin User
     if (window.userLibraryData.name)  params.append(ENTRY_HO_TEN, window.userLibraryData.name);
     if (window.userLibraryData.id)    params.append(ENTRY_MA_THE, window.userLibraryData.id);
     if (window.userLibraryData.email) params.append(ENTRY_EMAIL, window.userLibraryData.email);
+    if (window.userLibraryData.class) params.append(ENTRY_LOP, window.userLibraryData.class);
+
+    // TỰ ĐỘNG ĐIỀN 3 CUỐN SÁCH TỪ GIỎ HÀNG VÀO FORM
+    if (window.cart[0]) params.append(ENTRY_SACH_1, window.cart[0].fullTitle);
+    if (window.cart[1]) params.append(ENTRY_SACH_2, window.cart[1].fullTitle);
+    if (window.cart[2]) params.append(ENTRY_SACH_3, window.cart[2].fullTitle);
 
     const queryString = params.toString();
     if (queryString) {
         finalUrl += (finalUrl.includes('?') ? '&' : '?usp=pp_url&') + queryString;
     }
     
-    // Mở Form
+    // Mở Form & Reset giỏ hàng
     window.open(finalUrl, '_blank');
+    window.cart = [];
+    updateCartUI();
+    filterCatalog();
 }
 
 
@@ -976,7 +1125,8 @@ async function checkLibraryCard(userEmail) {
       window.userLibraryData = {
           name: cardData.name || "",
           id: cardId,
-          email: cardData.email || ""
+          email: cardData.email || "",
+          class: cardData.class || "" 
       };
       
     } else {
