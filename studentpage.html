@@ -7,7 +7,6 @@
 
 <style>
 /* ===== RESET ===== */
-/* ================= RESET ================= */
 *{
   box-sizing:border-box;
   margin:0;
@@ -46,12 +45,10 @@ body{
   display:flex;
   flex-direction:column;
   gap:10px;
-}
-
-.sidebar{
   background:rgba(255,255,255,0.35);
   backdrop-filter:blur(35px);
   border-right:1px solid rgba(255,255,255,0.5);
+  z-index: 10;
 }
 
 .profile{
@@ -140,7 +137,7 @@ body{
   flex-direction:column;
 }
 
-/* ================= BOARD ================= */
+/* ================= BOARD (TRANG CHÍNH) ================= */
 .board{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
@@ -148,7 +145,6 @@ body{
   height:100%;
 }
 
-/* ================= COLUMN GLASS ================= */
 .column{
   display:flex;
   flex-direction:column;
@@ -216,23 +212,179 @@ body{
   align-content: start;
 }
 
-/* ================= FEEDBACK ================= */
-#feedback iframe{
-  flex:1;
-  width:100%;
-  border:none;
-  border-radius:28px;
-  backdrop-filter:blur(20px);
+/* ================= CATALOG (TRA CỨU SÁCH) - NEW UI ================= */
+.catalog-controls {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
-/* ================= DIGITAL CARD (THẺ THƯ VIỆN) ================= */
+.search-box {
+  flex: 2;
+  position: relative;
+  min-width: 250px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 12px 20px 12px 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.6);
+  font-size: 15px;
+  outline: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  transition: 0.3s;
+}
+
+.search-box input:focus {
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.search-box::before {
+  content: '🔍';
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  opacity: 0.6;
+}
+
+.filter-box {
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-box select {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.6);
+  font-size: 15px;
+  outline: none;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  cursor: pointer;
+}
+
+/* LIST HEADER */
+.list-header {
+  display: flex;
+  padding: 15px 20px;
+  font-weight: bold;
+  color: #555;
+  border-bottom: 2px solid rgba(0,0,0,0.05);
+  margin-bottom: 10px;
+}
+
+.list-col-code { width: 15%; }
+.list-col-info { width: 45%; }
+.list-col-cat { width: 15%; }
+.list-col-stock { width: 10%; text-align: center; }
+.list-col-action { width: 15%; text-align: right; }
+
+/* LIST BODY */
+#bookCatalog {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  background: rgba(255,255,255,0.45);
+  border-radius: 16px;
+  margin-bottom: 10px;
+  transition: 0.2s;
+  border: 1px solid rgba(255,255,255,0.5);
+}
+
+.list-item:hover {
+  background: rgba(255,255,255,0.7);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  transform: translateY(-2px);
+}
+
+.list-col-code { font-size: 14px; color: #555; }
+
+.list-col-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.book-icon {
+  font-size: 35px;
+  background: rgba(255,255,255,0.5);
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.book-title-group h4 { margin: 0; font-size: 15px; color: #222; margin-bottom: 4px;}
+.book-title-group p { margin: 0; font-size: 12px; color: #777; }
+
+.cat-badge {
+  background: rgba(230, 230, 250, 0.8);
+  color: #666;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.list-col-stock {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+/* NÚT MƯỢN ĐÃ ĐƯỢC CHUYỂN THÀNH BUTTON ĐỂ XỬ LÝ JS */
+.btn-borrow {
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 14px;
+  display: inline-block;
+  transition: 0.2s;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  outline: none;
+}
+
+.btn-borrow.available {
+  background: #20c997;
+  color: white;
+  box-shadow: 0 4px 10px rgba(32, 201, 151, 0.3);
+}
+
+.btn-borrow.available:hover {
+  background: #1ba87e;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(32, 201, 151, 0.4);
+}
+
+.btn-borrow.unavailable {
+  background: #e9ecef;
+  color: #adb5bd;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ================= DIGITAL CARD ================= */
 .digital-card-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 30px 10px;
 }
-
 .digital-card {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -244,132 +396,40 @@ body{
   position: relative;
   overflow: hidden;
 }
-
 .digital-card::before {
-  content: '';
-  position: absolute;
-  width: 200px;
-  height: 200px;
+  content: ''; position: absolute; width: 200px; height: 200px;
   background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-  top: -100px;
-  right: -100px;
+  top: -100px; right: -100px;
 }
+.card-content { position: relative; z-index: 2; }
+.card-header-top { display: flex; justify-content: space-between; margin-bottom: 25px; }
+.card-brand { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.8; font-weight: bold; }
+.card-name { font-size: 24px; font-weight: 800; margin-top: 5px; }
+.card-role { font-size: 13px; background: rgba(255,255,255,0.2); display: inline-block; padding: 5px 12px; border-radius: 8px; margin-top: 10px; font-weight: 500; }
+.card-detail-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 12px; align-items: flex-end; }
+.card-detail-label { font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,0.7); font-weight: 600; }
+.card-detail-value { font-family: monospace; font-size: 18px; font-weight: bold; }
+.card-detail-text { font-size: 14px; font-weight: 500; word-break: break-all; }
+.no-card-wrapper { text-align: center; padding: 50px 20px; background: rgba(255,255,255,0.35); backdrop-filter: blur(30px); border-radius: 28px; margin-top: 20px; }
+.btn-register-link { display: inline-block; margin-top: 20px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; text-decoration: none; padding: 14px 28px; border-radius: 16px; font-weight: bold; font-size: 16px; transition: 0.3s; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3); }
 
-.digital-card::after {
-  content: '';
-  position: absolute;
-  width: 150px;
-  height: 150px;
-  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-  bottom: -50px;
-  left: -50px;
-}
-
-.card-content {
-  position: relative;
-  z-index: 2;
-}
-
-.card-header-top {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 25px;
-}
-
-.card-brand {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  opacity: 0.8;
-  font-weight: bold;
-}
-
-.card-name {
-  font-size: 24px;
-  font-weight: 800;
-  margin-top: 5px;
-}
-
-.card-role {
-  font-size: 13px;
-  background: rgba(255,255,255,0.2);
-  display: inline-block;
-  padding: 5px 12px;
-  border-radius: 8px;
-  margin-top: 10px;
-  font-weight: 500;
-}
-
-.card-detail-row {
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255,255,255,0.2);
-  padding-bottom: 8px;
-  margin-bottom: 12px;
-  align-items: flex-end;
-}
-
-.card-detail-label {
-  font-size: 11px;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.7);
-  font-weight: 600;
-}
-
-.card-detail-value {
-  font-family: monospace;
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.card-detail-text {
-  font-size: 14px;
-  font-weight: 500;
-  word-break: break-all;
-}
-
-.no-card-wrapper {
-  text-align: center;
-  padding: 50px 20px;
-  background: rgba(255,255,255,0.35);
-  backdrop-filter: blur(30px);
-  border-radius: 28px;
-  margin-top: 20px;
-}
-
-.btn-register-link {
-  display: inline-block;
-  margin-top: 20px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  text-decoration: none;
-  padding: 14px 28px;
-  border-radius: 16px;
-  font-weight: bold;
-  font-size: 16px;
-  transition: 0.3s;
-  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
-}
-
-.btn-register-link:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 25px rgba(37, 99, 235, 0.4);
-}
+/* ================= FEEDBACK ================= */
+#feedback iframe{ flex:1; width:100%; border:none; border-radius:28px; backdrop-filter:blur(20px); }
 
 /* ================= HIDE SCROLLBAR ================= */
-::-webkit-scrollbar{
-  width:0px;
-  background:transparent;
-}
-
-*{
-  scrollbar-width:none;
-}
+::-webkit-scrollbar{ width:0px; background:transparent; }
+*{ scrollbar-width:none; }
 
 /* ================= FADE ================= */
-@keyframes fadeIn{
-  from{ opacity:0; transform:translateY(12px); }
-  to{ opacity:1; transform:translateY(0); }
+@keyframes fadeIn{ from{ opacity:0; transform:translateY(12px); } to{ opacity:1; transform:translateY(0); } }
+
+/* Responsive adjustments for Catalog */
+@media (max-width: 900px) {
+    .list-header { display: none; }
+    .list-item { flex-direction: column; align-items: flex-start; gap: 10px; position: relative; padding-bottom: 60px;}
+    .list-col-code, .list-col-info, .list-col-cat, .list-col-stock { width: 100%; text-align: left; }
+    .list-col-action { width: 100%; position: absolute; bottom: 15px; left: 20px; text-align: left; }
+    .list-col-stock::before { content: 'Còn lại: '; font-weight: normal; color: #777;}
 }
 </style>
 </head>
@@ -383,6 +443,7 @@ body{
   </div>
 
   <button class="nav-btn active" onclick="showSection('home', this)">📚 Trang chính</button>
+  <button class="nav-btn" onclick="showSection('catalog', this)">🔍 Mượn sách</button>
   <button class="nav-btn" onclick="showSection('history', this)">📖 Lịch sử mượn</button>
   <button class="nav-btn" onclick="showSection('libraryCard', this)">🎟️ Thẻ thư viện</button>
   <button class="nav-btn" onclick="showSection('feedback', this)">💬 Feedback</button>
@@ -392,7 +453,7 @@ body{
 
 <div class="main">
 
-  <!-- TRANG CHÍNH: Chỉ hiện sách ĐANG MƯỢN và QUÁ HẠN -->
+  <!-- TRANG CHÍNH -->
   <div id="home" class="section active">
     <div class="board" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));">
       <div class="column">
@@ -406,7 +467,43 @@ body{
     </div>
   </div>
 
-  <!-- TRANG LỊCH SỬ: Chứa toàn bộ sách ĐÃ TRẢ -->
+  <!-- TRA CỨU MƯỢN SÁCH (NEW UI) -->
+  <div id="catalog" class="section">
+    <h2 style="margin-bottom: 20px; color: #333; display: flex; justify-content: space-between; align-items: center;">
+      <span>Tra cứu & Mượn sách</span>
+      <span id="refreshIndicator" style="font-size: 12px; color: #888; display: none; background: rgba(0,0,0,0.05); padding: 4px 10px; border-radius: 12px;">Đang làm mới...</span>
+    </h2>
+    
+    <div class="catalog-controls">
+      <div class="search-box">
+        <input type="text" id="searchInput" onkeyup="filterCatalog()" placeholder="Tìm tên sách, mã sách hoặc tác giả...">
+      </div>
+      <div class="filter-box">
+        <select id="categoryFilter" onchange="filterCatalog()">
+          <option value="all">📚 Tất cả thể loại</option>
+          <!-- Các thể loại sẽ được thêm tự động bằng code JS -->
+        </select>
+      </div>
+    </div>
+
+    <!-- Tiêu đề cột -->
+    <div class="list-header">
+      <div class="list-col-code">Mã</div>
+      <div class="list-col-info">Sách / Tác giả</div>
+      <div class="list-col-cat">Thể loại</div>
+      <div class="list-col-stock">Còn lại</div>
+      <div class="list-col-action">Thao tác</div>
+    </div>
+
+    <div id="loadingCatalog" style="text-align: center; padding: 30px; color: #666;">
+      Đang đồng bộ dữ liệu kho sách...
+    </div>
+
+    <!-- Danh sách sách -->
+    <div id="bookCatalog"></div>
+  </div>
+
+  <!-- TRANG LỊCH SỬ -->
   <div id="history" class="section">
     <h2 style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
       <span>📖 Lịch sử mượn (Đã trả)</span>
@@ -415,15 +512,10 @@ body{
     <div id="historyList"></div>
   </div>
 
+  <!-- THẺ THƯ VIỆN -->
   <div id="libraryCard" class="section">
     <h2>🎟️ Thẻ Thư Viện Của Bạn</h2>
-    
-    <!-- Loading text -->
-    <div id="loading-card" style="text-align: center; padding: 40px;">
-      <p>Đang kiểm tra hệ thống thẻ...</p>
-    </div>
-
-    <!-- View khi ĐÃ CÓ THẺ -->
+    <div id="loading-card" style="text-align: center; padding: 40px;"><p>Đang kiểm tra hệ thống thẻ...</p></div>
     <div id="has-card-view" style="display: none;">
       <div class="digital-card-wrapper">
         <div class="digital-card">
@@ -436,7 +528,6 @@ body{
               </div>
               <div style="font-size: 35px;">🏛️</div>
             </div>
-            
             <div class="card-detail-row">
               <span class="card-detail-label">Mã Thẻ</span>
               <span class="card-detail-value" id="my-card-id">---</span>
@@ -449,8 +540,6 @@ body{
         </div>
       </div>
     </div>
-
-    <!-- View khi CHƯA CÓ THẺ -->
     <div id="no-card-view" class="no-card-wrapper" style="display: none;">
       <h3 style="font-size: 20px; margin-bottom: 10px; color: #333;">Bạn chưa có thẻ thư viện</h3>
       <p style="color: #666;">Vui lòng đăng ký thông tin để hệ thống tạo thẻ điện tử cho bạn nhé.</p>
@@ -458,6 +547,7 @@ body{
     </div>
   </div>
 
+  <!-- FEEDBACK -->
   <div id="feedback" class="section">
     <iframe src="feedback.html"></iframe>
   </div>
@@ -466,24 +556,10 @@ body{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { 
-  getAuth, 
-  onAuthStateChanged, 
-  signOut 
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-import { 
-  getFirestore,
-  doc,
-  updateDoc,
-  serverTimestamp,
-  onSnapshot,
-  collection, 
-  query, 
-  where, 
-  getDocs
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+import { getFirestore, doc, updateDoc, serverTimestamp, onSnapshot, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-// ================= APP 1: QUẢN LÝ TÀI KHOẢN (GỐC) =================
+// ================= FIREBASE QUẢN LÝ TÀI KHOẢN =================
 const firebaseConfig = {
   apiKey: "AIzaSyCEdkzclcyqLDQv8kRUBN4l71AggHn1jKc",
   authDomain: "student-admin-system-f92e7.firebaseapp.com",
@@ -497,7 +573,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ================= APP 2: ĐỌC DỮ LIỆU THẺ TỪ TRANG ĐĂNG KÝ =================
+// ================= FIREBASE THẺ THƯ VIỆN =================
 const cardFirebaseConfig = {
   apiKey: "AIzaSyCgpPUYV5lqZ_5zUua8Q_ThNEIkPsEg2do",
   authDomain: "thuvien-44050.firebaseapp.com",
@@ -510,39 +586,38 @@ const cardFirebaseConfig = {
 const cardApp = initializeApp(cardFirebaseConfig, "cardApp");
 const cardDb = getFirestore(cardApp);
 
-// LINK GOOGLE SHEET
+// ================= CẤU HÌNH LIÊN KẾT GOOGLE =================
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBheU1Zxps0sQ0DTdJtRzbaFE3Wm2g-vr8mO4GYKmr9raDtKET7xpOnnTcygnkkKGHwx7LzJBETL72/pub?output=csv";
+const FORM_MUON_SACH_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeAXn2voxxtPA7uZAvHk_Z8L-nuZ4GWPtdJ21st5-l-iy-TKg/viewform"; 
+const SHEET_KHO_SACH_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBheU1Zxps0sQ0DTdJtRzbaFE3Wm2g-vr8mO4GYKmr9raDtKET7xpOnnTcygnkkKGHwx7LzJBETL72/pub?gid=1599319722&single=true&output=csv"; 
+
+// ================= MÃ ENTRY ĐIỀN FORM TỰ ĐỘNG =================
+const ENTRY_HO_TEN = "entry.500506778"; 
+const ENTRY_MA_THE = "entry.266807010"; 
+const ENTRY_EMAIL  = "emailAddress"; // Chuẩn của Google Form thu thập Email mặc định
 
 let unsubscribeSnapshot = null;
+let allCatalogBooks = []; 
 
-// ================= AUTH CHECK VÀ REALTIME ONLINE/OFFLINE =================
+// LƯU TRỮ TOÀN BỘ THÔNG TIN THẺ CỦA USER ĐỂ ĐIỀN FORM
+window.userLibraryData = null;
+window.hasCheckedCard = false;
+
+// ================= AUTH =================
 onAuthStateChanged(auth, async (user)=>{
-
   if(!user){
     window.location.href="index.html";
     return;
   }
-
   const userRef = doc(db, "users", user.uid);
-
-  // BÁO CÁO TRẠNG THÁI ONLINE LÊN FIREBASE KHI ĐĂNG NHẬP THÀNH CÔNG
   try {
-    await updateDoc(userRef, {
-      online: true,
-      lastSeen: serverTimestamp()
-    });
-  } catch (error) {
-    console.error("Lỗi cập nhật trạng thái online:", error);
-  }
+    await updateDoc(userRef, { online: true, lastSeen: serverTimestamp() });
+  } catch (error) { console.error(error); }
 
-  if(unsubscribeSnapshot){
-    unsubscribeSnapshot();
-  }
-
+  if(unsubscribeSnapshot) unsubscribeSnapshot();
   unsubscribeSnapshot = onSnapshot(userRef, async (snap)=>{
     if(!snap.exists()) return;
-    const data = snap.data();
-    if(data.status === "blocked"){
+    if(snap.data().status === "blocked"){
       alert("Tài khoản của bạn đã bị khóa!");
       await signOut(auth);
       window.location.href="index.html";
@@ -554,205 +629,114 @@ onAuthStateChanged(auth, async (user)=>{
   document.getElementById("email").textContent = user.email || "Không có email";
 
   const userEmail = user.email ? user.email.trim().toLowerCase() : "";
-
   if(userEmail) {
-      loadData(userEmail);
-      checkLibraryCard(userEmail);
+      loadData(userEmail, false); 
+      checkLibraryCard(userEmail); 
+      loadCatalog(false); 
   } else {
-      document.getElementById("loading-card").innerHTML = "<p style='color:red;'>Tài khoản của bạn không được liên kết với Email nên không thể tra cứu thẻ.</p>";
+      document.getElementById("loading-card").innerHTML = "<p style='color:red;'>Không có Email.</p>";
   }
 });
 
-
-// ================= HÀM GIẢI MÃ CSV CHUẨN XÁC =================
+// ================= UTILS =================
 function parseCSV(str) {
-    const result = [];
-    let row = [];
-    let col = '';
-    let inQuotes = false;
+    const result = []; let row = []; let col = ''; let inQuotes = false;
     for (let i = 0; i < str.length; i++) {
-        const char = str[i];
-        const nextChar = str[i + 1];
+        const char = str[i]; const nextChar = str[i + 1];
         if (char === '"') {
-            if (inQuotes && nextChar === '"') {
-                col += '"';
-                i++;
-            } else {
-                inQuotes = !inQuotes;
-            }
-        } else if (char === ',' && !inQuotes) {
-            row.push(col);
-            col = '';
+            if (inQuotes && nextChar === '"') { col += '"'; i++; } else { inQuotes = !inQuotes; }
+        } else if (char === ',' && !inQuotes) { row.push(col); col = '';
         } else if ((char === '\n' || char === '\r') && !inQuotes) {
             if (char === '\r' && nextChar === '\n') i++;
-            row.push(col);
-            result.push(row);
-            row = [];
-            col = '';
-        } else {
-            col += char;
-        }
+            row.push(col); result.push(row); row = []; col = '';
+        } else { col += char; }
     }
-    if (col !== '' || row.length > 0) {
-        row.push(col);
-        result.push(row);
-    }
+    if (col !== '' || row.length > 0) { row.push(col); result.push(row); }
     return result;
 }
 
-// ================= HÀM TÌM CỘT THÔNG MINH TUYỆT ĐỐI (FIX LỖI BẮT NHẦM CỘT) =================
 const getColIndex = (headers, keywords) => {
     const lowerHeaders = headers.map(h => h.toLowerCase().trim());
-    
-    // Ưu tiên 1: Khớp chính xác hoàn toàn (Ví dụ: đúng chữ "Trạng thái" hoặc "Email")
-    for (const kw of keywords) {
-        const idx = lowerHeaders.indexOf(kw.toLowerCase());
-        if (idx !== -1) return idx;
-    }
-    
-    // Ưu tiên 2: Cột bắt đầu bằng từ khóa (Tránh bắt nhầm các cột rác nằm trước)
-    for (const kw of keywords) {
-        for (let i = 0; i < lowerHeaders.length; i++) {
-            if (lowerHeaders[i].startsWith(kw.toLowerCase())) return i;
-        }
-    }
-
-    // Ưu tiên 3: Chứa từ khóa
-    for (const kw of keywords) {
-        for (let i = 0; i < lowerHeaders.length; i++) {
-            if (lowerHeaders[i].includes(kw.toLowerCase())) return i;
-        }
-    }
+    for (const kw of keywords) { const idx = lowerHeaders.indexOf(kw.toLowerCase()); if (idx !== -1) return idx; }
+    for (const kw of keywords) { for (let i = 0; i < lowerHeaders.length; i++) { if (lowerHeaders[i].startsWith(kw.toLowerCase())) return i; } }
+    for (const kw of keywords) { for (let i = 0; i < lowerHeaders.length; i++) { if (lowerHeaders[i].includes(kw.toLowerCase())) return i; } }
     return -1;
 };
 
-// ================= LOAD GOOGLE SHEET =================
-async function loadData(userEmail){
+// ================= LOAD SÁCH ĐANG MƯỢN =================
+async function loadData(userEmail, isSilent = false){
   try {
     let csvText = "";
-    
-    // FETCH CSV CÓ BỘ LỌC CHỐNG LỖI MẠNG GIỐNG ADMIN
-    try {
-        const res = await fetch(SHEET_URL);
-        if (res.ok) { csvText = await res.text(); } else { throw new Error("Direct fetch failed"); }
+    const cacheBuster = `&t=${new Date().getTime()}`;
+    const targetUrl = SHEET_URL + cacheBuster;
+
+    try { const res = await fetch(targetUrl); if (res.ok) { csvText = await res.text(); } else throw new Error();
     } catch (e1) {
-        try {
-            const proxyUrl1 = `https://corsproxy.io/?` + encodeURIComponent(SHEET_URL);
-            const response1 = await fetch(proxyUrl1);
-            if (response1.ok) { csvText = await response1.text(); } else { throw new Error("Proxy 1 failed"); }
-        } catch (e2) {
-            const proxyUrl2 = `https://api.allorigins.win/raw?url=${encodeURIComponent(SHEET_URL)}`;
-            const response2 = await fetch(proxyUrl2);
-            if (response2.ok) { csvText = await response2.text(); } else { throw new Error("All methods failed"); }
-        }
+        try { const res1 = await fetch(`https://corsproxy.io/?` + encodeURIComponent(targetUrl)); if (res1.ok) { csvText = await res1.text(); } else throw new Error();
+        } catch (e2) { const res2 = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`); if (res2.ok) { csvText = await res2.text(); } }
     }
     
     const rows = parseCSV(csvText);
     if (rows.length === 0) return;
 
-    // Lấy tiêu đề và tìm vị trí cột - LƯU Ý ĐÃ XOÁ CHỮ "GHI CHÚ"
     const headers = rows[0];
     const idxEmail = getColIndex(headers, ["địa chỉ email", "email", "mail"]);
     const idxBook1 = getColIndex(headers, ["cuốn thứ nhất", "sách 1", "tên sách", "book 1"]);
     const idxBook2 = getColIndex(headers, ["cuốn thứ hai", "sách 2", "book 2"]);
     const idxBook3 = getColIndex(headers, ["cuốn thứ ba", "sách 3", "book 3"]);
     const idxReturnDate = getColIndex(headers, ["ngày trả", "hạn trả"]);
-    
-    // Tuyệt đối không để chữ "ghi chú" ở đây, tránh việc hàm bắt nhầm cột Ghi chú rồi bỏ qua Trạng thái
     const idxStatus = getColIndex(headers, ["trạng thái", "status", "tình trạng"]);
 
-    const today = new Date();
-    today.setHours(0,0,0,0);
-
+    const today = new Date(); today.setHours(0,0,0,0);
     const borrowList = document.getElementById("borrowList");
     const overdueList = document.getElementById("overdueList");
     const historyList = document.getElementById("historyList");
-
-    borrowList.innerHTML="";
-    overdueList.innerHTML="";
-    historyList.innerHTML="";
-
+    
+    borrowList.innerHTML=""; overdueList.innerHTML=""; historyList.innerHTML="";
     let borrowCount=0, overdueCount=0, historyCount=0;
 
-    // Lọc danh sách khớp email
-    const userRows = rows.slice(1).filter(row =>
-      idxEmail !== -1 && row[idxEmail] && row[idxEmail].trim().toLowerCase() === userEmail
-    );
+    const userRows = rows.slice(1).filter(row => idxEmail !== -1 && row[idxEmail] && row[idxEmail].trim().toLowerCase() === userEmail);
 
     userRows.forEach(row=>{
       const b1 = idxBook1 !== -1 && row[idxBook1] ? row[idxBook1].trim() : "";
       const b2 = idxBook2 !== -1 && row[idxBook2] ? row[idxBook2].trim() : "";
       const b3 = idxBook3 !== -1 && row[idxBook3] ? row[idxBook3].trim() : "";
-      
       const books = [b1, b2, b3].filter(b => b !== "");
       const returnDateRaw = (idxReturnDate !== -1 && row[idxReturnDate]) ? row[idxReturnDate].trim() : "";
 
       let isReturned = false;
-
-      // XÁC ĐỊNH TRẠNG THÁI (Đã trỏ chính xác vào cột Trạng thái)
       if (idxStatus !== -1 && row[idxStatus]) {
-          let s = row[idxStatus].trim().toLowerCase();
-          let sNoMark = s.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-          
-          if (sNoMark.includes("da tra") || sNoMark === "xong" || sNoMark === "ok" || s.includes("đã trả") || s.includes("✅")) {
-              isReturned = true;
-          }
-          // Chống nhận diện nhầm nếu thủ thư ghi chữ "Chưa trả" hoặc "Đang mượn"
-          if (sNoMark.includes("dang muon") || sNoMark.includes("chua tra")) {
-              isReturned = false;
-          }
+          let sNoMark = row[idxStatus].trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          if (sNoMark.includes("da tra") || sNoMark === "xong" || sNoMark === "ok" || row[idxStatus].includes("✅")) isReturned = true;
+          if (sNoMark.includes("dang muon") || sNoMark.includes("chua tra")) isReturned = false;
       }
 
       let finalStatus = "Đang mượn";
-
-      // Phân loại trạng thái cuối cùng
-      if (isReturned) {
-          finalStatus = "Đã trả xong";
-      } else if (returnDateRaw) {
-          // Xử lý đổi dấu "-" thành "/" để ngày tháng không bị lỗi
+      if (isReturned) finalStatus = "Đã trả xong";
+      else if (returnDateRaw) {
           const parts = returnDateRaw.replace(/-/g, "/").split("/");
           if (parts.length >= 3) {
               const due = new Date(parts[2], parts[1]-1, parts[0]);
-              if (today > due) {
-                  finalStatus = "Quá hạn";
-              }
+              if (today > due) finalStatus = "Quá hạn";
           }
       }
 
-      // Tạo thẻ giao diện
       books.forEach(book=>{
-        const card = document.createElement("div");
-        card.className="card";
-
+        const card = document.createElement("div"); card.className="card";
         if(finalStatus === "Đang mượn"){
           card.classList.add("borrowing");
-          card.innerHTML=`
-            <strong>${book}</strong>
-            <div>Hạn trả: ${returnDateRaw || "Không có"}</div>
-            <div>Trạng thái: ${finalStatus}</div>
-          `;
-          borrowList.appendChild(card);
-          borrowCount++;
+          card.innerHTML=`<strong>${book}</strong><div>Hạn trả: ${returnDateRaw || "Không có"}</div><div>Trạng thái: ${finalStatus}</div>`;
+          borrowList.appendChild(card); borrowCount++;
         }
         else if(finalStatus === "Quá hạn"){
           card.classList.add("overdue");
-          card.innerHTML=`
-            <strong>${book}</strong>
-            <div>Hạn trả: ${returnDateRaw || "Không có"}</div>
-            <div>Trạng thái: ${finalStatus}</div>
-          `;
-          overdueList.appendChild(card);
-          overdueCount++;
+          card.innerHTML=`<strong>${book}</strong><div>Hạn trả: ${returnDateRaw || "Không có"}</div><div>Trạng thái: ${finalStatus}</div>`;
+          overdueList.appendChild(card); overdueCount++;
         }
-        else { // "Đã trả xong" - Thêm vào lịch sử mượn
+        else {
           card.classList.add("returned");
-          card.innerHTML=`
-            <strong>${book}</strong>
-            <div>Hạn trả: ${returnDateRaw || "Không có"}</div>
-            <div>Trạng thái: ${finalStatus}</div>
-          `;
-          historyList.appendChild(card);
-          historyCount++;
+          card.innerHTML=`<strong>${book}</strong><div>Hạn trả: ${returnDateRaw || "Không có"}</div><div>Trạng thái: ${finalStatus}</div>`;
+          historyList.appendChild(card); historyCount++;
         }
       });
     });
@@ -760,23 +744,209 @@ async function loadData(userEmail){
     document.getElementById("borrowCount").textContent=borrowCount;
     document.getElementById("overdueCount").textContent=overdueCount;
     document.getElementById("historyCount").textContent=historyCount;
+  } catch (err) { console.error(err); }
+}
+
+// ================= LOAD KHO SÁCH =================
+async function loadCatalog(isSilent = false) {
+  const catalogDiv = document.getElementById("bookCatalog");
+  const loadingDiv = document.getElementById("loadingCatalog");
+  const filterSelect = document.getElementById("categoryFilter");
+  const refreshIndicator = document.getElementById("refreshIndicator");
+  
+  if (!isSilent) {
+    catalogDiv.innerHTML = "";
+    loadingDiv.style.display = "block";
+  } else {
+    refreshIndicator.style.display = "inline-block";
+  }
+
+  try {
+    let csvText = "";
+    const cacheBuster = `&t=${new Date().getTime()}`;
+    const targetUrl = SHEET_KHO_SACH_CSV + cacheBuster;
+
+    try { 
+        const res = await fetch(targetUrl); 
+        if (res.ok) { csvText = await res.text(); } else throw new Error(`Fetch trực tiếp thất bại`);
+    } catch (e1) {
+        try { 
+            const res1 = await fetch(`https://corsproxy.io/?` + encodeURIComponent(targetUrl)); 
+            if (res1.ok) { csvText = await res1.text(); } else throw new Error(`CORS Proxy thất bại`);
+        } catch (e2) { 
+            const res2 = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`); 
+            if (res2.ok) { csvText = await res2.text(); } else throw new Error(`Tất cả Proxy đều bị từ chối kết nối.`);
+        }
+    }
+
+    const rows = parseCSV(csvText);
+    if (rows.length < 2) {
+        if (!isSilent) loadingDiv.innerHTML = "<span style='color:red;'>Không tìm thấy dữ liệu sách.</span>";
+        return;
+    }
+
+    const headers = rows[0];
+    const idxMaSach = getColIndex(headers, ["mã sách", "mã"]);
+    const idxTenSach = getColIndex(headers, ["tên sách", "sách"]);
+    const idxPhanLoai = getColIndex(headers, ["phân loại", "thể loại"]);
+    const idxConLai = getColIndex(headers, ["còn lại", "số lượng còn"]);
+
+    allCatalogBooks = [];
+    let uniqueCategories = new Set();
+    
+    if (!isSilent) loadingDiv.style.display = "none";
+    refreshIndicator.style.display = "none";
+
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (idxTenSach === -1 || !row[idxTenSach]) continue;
+
+      const maSach = idxMaSach !== -1 ? row[idxMaSach].trim() : `S${i}`;
+      const tenSach = row[idxTenSach].trim();
+      const phanLoai = idxPhanLoai !== -1 ? row[idxPhanLoai].trim() : "Khác";
+      const conLai = idxConLai !== -1 ? parseInt(row[idxConLai]) || 0 : 0;
+
+      let titleOnly = tenSach;
+      let authorName = "Chưa rõ tác giả";
+      const authorMatch = tenSach.match(/(.+?)\s*\((.+?)\)/);
+      if (authorMatch) {
+          titleOnly = authorMatch[1].trim();
+          authorName = authorMatch[2].trim();
+      }
+
+      if(phanLoai) uniqueCategories.add(phanLoai);
+
+      const bookObj = {
+          maSach, titleOnly, authorName, phanLoai, conLai,
+          searchText: `${maSach} ${tenSach}`.toLowerCase(),
+          isAvailable: conLai > 0
+      };
+      allCatalogBooks.push(bookObj);
+    }
+
+    const currentSelectedCat = filterSelect.value;
+    filterSelect.innerHTML = '<option value="all">📚 Tất cả thể loại</option>';
+    uniqueCategories.forEach(cat => {
+        const option = document.createElement("option");
+        option.value = cat;
+        option.textContent = `🔖 ${cat}`;
+        filterSelect.appendChild(option);
+    });
+    if (uniqueCategories.has(currentSelectedCat)) {
+        filterSelect.value = currentSelectedCat;
+    }
+
+    filterCatalog();
+
   } catch (err) {
-    console.error("Lỗi khi tải dữ liệu sách từ Sheet:", err);
+    refreshIndicator.style.display = "none";
+    if (!isSilent) {
+        loadingDiv.innerHTML = `<span style="color:red">Lỗi tải dữ liệu.</span>`;
+    }
   }
 }
 
-// ================= KIỂM TRA THẺ THƯ VIỆN =================
+// Hàm vẽ danh sách sách ra màn hình
+function renderCatalog(books) {
+    const catalogDiv = document.getElementById("bookCatalog");
+    catalogDiv.innerHTML = "";
+
+    if (books.length === 0) {
+        catalogDiv.innerHTML = "<div style='text-align:center; padding: 20px; color:#777;'>Không tìm thấy sách phù hợp.</div>";
+        return;
+    }
+
+    books.forEach(b => {
+      const item = document.createElement("div");
+      item.className = "list-item";
+      
+      item.innerHTML = `
+        <div class="list-col-code">${b.maSach}</div>
+        <div class="list-col-info">
+          <div class="book-icon">📚</div>
+          <div class="book-title-group">
+            <h4>${b.titleOnly}</h4>
+            <p>✍️ ${b.authorName}</p>
+          </div>
+        </div>
+        <div class="list-col-cat">
+          <span class="cat-badge">${b.phanLoai}</span>
+        </div>
+        <div class="list-col-stock" style="color: ${b.isAvailable ? '#222' : '#ff3b30'}">
+          ${b.conLai}
+        </div>
+        <div class="list-col-action">
+          <button onclick="borrowBook(${b.isAvailable})" 
+             class="btn-borrow ${b.isAvailable ? 'available' : 'unavailable'}">
+            ${b.isAvailable ? 'Mượn' : 'Hết sách'}
+          </button>
+        </div>
+      `;
+      catalogDiv.appendChild(item);
+    });
+}
+
+window.filterCatalog = function() {
+    const searchText = document.getElementById("searchInput").value.toLowerCase();
+    const selectedCat = document.getElementById("categoryFilter").value;
+
+    const filtered = allCatalogBooks.filter(b => {
+        const matchText = b.searchText.includes(searchText);
+        const matchCat = selectedCat === "all" || b.phanLoai === selectedCat;
+        return matchText && matchCat;
+    });
+
+    renderCatalog(filtered);
+}
+
+// ================= HÀM XỬ LÝ NÚT MƯỢN SÁCH TỰ ĐỘNG ĐIỀN FORM =================
+window.borrowBook = function(isAvailable) {
+    if (!isAvailable) return;
+
+    if (!window.hasCheckedCard) {
+        alert("Đang tải dữ liệu thẻ từ hệ thống, vui lòng đợi vài giây...");
+        return;
+    }
+
+    if (!window.userLibraryData) {
+        alert("Bạn chưa có thẻ thư viện!\nVui lòng tạo thẻ điện tử trước khi có thể đăng ký mượn sách nhé.");
+        showSection('libraryCard', document.querySelectorAll('.nav-btn')[3]);
+        return;
+    }
+
+    let finalUrl = FORM_MUON_SACH_URL;
+    let params = new URLSearchParams();
+
+    // Điền Họ Tên, Mã Thẻ và Email
+    if (window.userLibraryData.name)  params.append(ENTRY_HO_TEN, window.userLibraryData.name);
+    if (window.userLibraryData.id)    params.append(ENTRY_MA_THE, window.userLibraryData.id);
+    if (window.userLibraryData.email) params.append(ENTRY_EMAIL, window.userLibraryData.email);
+
+    const queryString = params.toString();
+    if (queryString) {
+        finalUrl += (finalUrl.includes('?') ? '&' : '?usp=pp_url&') + queryString;
+    }
+    
+    // Mở Form
+    window.open(finalUrl, '_blank');
+}
+
+
+setInterval(() => {
+    const catalogTabActive = document.getElementById('catalog').classList.contains('active');
+    if (catalogTabActive) {
+        loadCatalog(true); 
+    }
+}, 30000); 
+
+// ================= KIỂM TRA THẺ THƯ VIỆN & LƯU THÔNG TIN =================
 async function checkLibraryCard(userEmail) {
   const loadingCard = document.getElementById("loading-card");
   const hasCardView = document.getElementById("has-card-view");
   const noCardView = document.getElementById("no-card-view");
-  
   try {
-    let cardData = null;
-    let cardRole = "";
-    let cardId = "";
-
-    // Dùng cardDb thay vì db để đọc dữ liệu từ project thuvien-44050
+    let cardData = null; let cardRole = ""; let cardId = "";
+    
     const studentsRef = collection(cardDb, "students");
     const qStudent = query(studentsRef, where("email", "==", userEmail));
     const studentSnap = await getDocs(qStudent);
@@ -789,72 +959,65 @@ async function checkLibraryCard(userEmail) {
       const guestsRef = collection(cardDb, "guests");
       const qGuest = query(guestsRef, where("email", "==", userEmail));
       const guestSnap = await getDocs(qGuest);
-      
       if (!guestSnap.empty) {
-        cardData = guestSnap.docs[0].data();
-        cardRole = "Khách ngoài trường";
-        cardId = guestSnap.docs[0].id;
+        cardData = guestSnap.docs[0].data(); cardRole = "Khách ngoài trường"; cardId = guestSnap.docs[0].id;
       }
     }
 
     loadingCard.style.display = "none";
-
+    
     if (cardData) {
       document.getElementById("my-card-name").textContent = cardData.name || "Chưa cập nhật tên";
       document.getElementById("my-card-role").textContent = cardRole;
       document.getElementById("my-card-id").textContent = cardId;
       document.getElementById("my-card-email").textContent = cardData.email;
+      hasCardView.style.display = "block"; noCardView.style.display = "none";
       
-      hasCardView.style.display = "block";
-      noCardView.style.display = "none";
+      window.userLibraryData = {
+          name: cardData.name || "",
+          id: cardId,
+          email: cardData.email || ""
+      };
+      
     } else {
-      hasCardView.style.display = "none";
-      noCardView.style.display = "block";
+      hasCardView.style.display = "none"; noCardView.style.display = "block";
+      window.userLibraryData = null;
     }
-    
+    window.hasCheckedCard = true;
+
   } catch (error) {
-    console.error("Lỗi rớt khi tải thẻ thư viện:", error);
-    loadingCard.innerHTML = `
-        <p style='color:#ff3b30; font-weight:bold;'>Có lỗi quyền truy cập Firebase!</p>
-        <p style='font-size: 14px; margin-top:5px; color:#666;'>Bạn vui lòng mở Firebase project 'thuvien-44050', chỉnh sửa <b>Rules</b> của Firestore cho phép "allow read: if true;" để thẻ được hiển thị.</p>
-    `;
+    loadingCard.innerHTML = `<p style='color:#ff3b30; font-weight:bold;'>Có lỗi quyền truy cập thẻ!</p>`;
+    window.hasCheckedCard = true;
+    window.userLibraryData = null;
   }
 }
 
-// ================= LOGOUT =================
+// ================= LOGOUT & NAV =================
 window.logout = async function(){
   const user = auth.currentUser;
-  if(user){
-    await updateDoc(doc(db, "users", user.uid), {
-      online: false,
-      lastSeen: serverTimestamp()
-    });
-  }
-  await signOut(auth);
-  window.location.href="index.html"; 
+  if(user) await updateDoc(doc(db, "users", user.uid), { online: false, lastSeen: serverTimestamp() });
+  await signOut(auth); window.location.href="index.html"; 
 }
 
-// ================= TAB CLOSE (TỐI ƯU HÓA) =================
 window.addEventListener("beforeunload", () => {
   const user = auth.currentUser;
-  if(user){
-    // Bỏ chữ "async/await" ở đây vì trình duyệt sẽ huỷ các lệnh await khi đóng tab
-    updateDoc(doc(db, "users", user.uid), {
-      online: false,
-      lastSeen: serverTimestamp()
-    }).catch(err => console.log(err));
-  }
+  if(user) updateDoc(doc(db, "users", user.uid), { online: false, lastSeen: serverTimestamp() }).catch(e=>{});
 });
 
-// ================= NAV SWITCH =================
 window.showSection=function(id,btn){
   document.querySelectorAll(".section").forEach(sec=>sec.classList.remove("active"));
   document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
   document.getElementById(id).classList.add("active");
   btn.classList.add("active");
+
+  if (id === 'catalog') {
+      loadCatalog(true); 
+  } else if (id === 'home' || id === 'history') {
+      const user = auth.currentUser;
+      if (user && user.email) loadData(user.email, true);
+  }
 }
 
 </script>
-
 </body>
 </html>
