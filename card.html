@@ -254,7 +254,7 @@
             </div>
         </div>
 
-        <!-- 4. STUDENT REGISTRATION FORM -->
+        <!-- 4. STUDENT REGISTRATION FORM (ĐÃ THÊM XÁC THỰC 2 BƯỚC) -->
         <div id="view-student-form" class="view-section">
             <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100/50 card-hover">
                 <button type="button" class="btn-back flex items-center text-slate-500 hover:text-blue-600 mb-6 text-sm font-semibold transition-colors group">
@@ -288,7 +288,7 @@
                     </div>
                 </div>
 
-                <form id="form-register-student" class="space-y-5">
+                <form id="form-register-student" class="space-y-4">
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-2">Số điện thoại <span class="text-red-500">*</span></label>
                         <div class="relative">
@@ -303,9 +303,23 @@
                             <input type="email" id="st-input-email" required class="input-focus pl-12 w-full px-4 py-4 border-2 border-slate-200 rounded-2xl focus:outline-none shadow-sm" placeholder="email@example.com">
                         </div>
                     </div>
-                    <button type="submit" class="btn-primary w-full text-white font-semibold py-4 px-6 rounded-2xl mt-6 shadow-lg text-lg">
-                        <i class="fas fa-id-card mr-3"></i>
-                        Đăng ký & Nhận Thẻ
+
+                    <!-- Hộp thông báo bảo mật 2 lớp -->
+                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-2xl border border-blue-100 flex items-start gap-4 mt-6">
+                        <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm border border-blue-100">
+                            <i class="fas fa-shield-check text-blue-600 text-lg"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-800 font-bold mb-1">Bảo mật 2 Lớp (2-Step)</p>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Để chống giả mạo, hệ thống sẽ yêu cầu xác thực <strong>Số điện thoại (SMS)</strong> trước, sau đó mới xác thực <strong>Email</strong> để hoàn tất cấp thẻ.
+                            </p>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btn-start-verify-st" class="btn-primary w-full text-white font-semibold py-4 px-6 rounded-2xl mt-6 shadow-lg flex justify-center items-center text-lg">
+                        <span id="text-start-verify-st"><i class="fas fa-arrow-right mr-3"></i>Bắt đầu Xác thực</span>
+                        <div id="load-start-verify-st" class="hidden ml-3 loader-sm"></div>
                     </button>
                 </form>
             </div>
@@ -358,18 +372,18 @@
                         </div>
                     </div>
 
-                    <button type="submit" id="btn-start-verify" class="btn-primary w-full text-white font-semibold py-4 px-6 rounded-2xl mt-6 shadow-lg flex justify-center items-center text-lg">
-                        <span id="text-start-verify"><i class="fas fa-arrow-right mr-3"></i>Bắt đầu Xác thực</span>
-                        <div id="load-start-verify" class="hidden ml-3 loader-sm"></div>
+                    <button type="submit" id="btn-start-verify-guest" class="btn-primary w-full text-white font-semibold py-4 px-6 rounded-2xl mt-6 shadow-lg flex justify-center items-center text-lg">
+                        <span id="text-start-verify-guest"><i class="fas fa-arrow-right mr-3"></i>Bắt đầu Xác thực</span>
+                        <div id="load-start-verify-guest" class="hidden ml-3 loader-sm"></div>
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- 6. OTP VERIFICATION SCREEN (ĐỘNG: BƯỚC 1 SMS -> BƯỚC 2 EMAIL) -->
+        <!-- 6. OTP VERIFICATION SCREEN (DÙNG CHUNG CHO CẢ HỌC SINH VÀ KHÁCH) -->
         <div id="view-otp" class="view-section">
             <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100/50 card-hover text-center">
-                <button type="button" id="btn-back-to-guest" class="flex items-center text-slate-500 hover:text-blue-600 mb-6 text-sm font-semibold transition-colors group ml-0">
+                <button type="button" id="btn-back-from-otp" class="flex items-center text-slate-500 hover:text-blue-600 mb-6 text-sm font-semibold transition-colors group ml-0">
                     <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform"></i> Đổi thông tin
                 </button>
                 
@@ -391,7 +405,7 @@
                 <p class="text-slate-500 text-sm mb-6">Mã bảo mật đã được gửi đến <strong id="display-target" class="text-blue-600 tracking-wider"></strong></p>
 
                 <form id="form-verify-otp">
-                    <input type="text" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '')" id="input-otp" maxlength="6" required class="input-focus w-full text-center tracking-[0.5em] text-3xl font-mono font-bold px-6 py-5 border-2 border-slate-200 rounded-2xl focus:outline-none mb-4 shadow-inner bg-slate-50" placeholder="------">
+                    <input type="text" inputmode="numeric" pattern="[0-9]*" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6)" id="input-otp" maxlength="6" minlength="6" required class="input-focus w-full text-center tracking-[0.5em] text-3xl font-mono font-bold px-6 py-5 border-2 border-slate-200 rounded-2xl focus:outline-none mb-4 shadow-inner bg-slate-50" placeholder="------">
                     
                     <!-- Khung đếm ngược & Gửi lại mã -->
                     <div class="flex justify-between items-center mb-8 px-2">
@@ -483,9 +497,11 @@
 
         let currentUser = null;
         let foundStudentData = null;
-        let guestTempData = {};
         
-        // CÁC BIẾN LƯU TRẠNG THÁI OTP VÀ ĐẾM NGƯỢC
+        // --- BIẾN TOÀN CỤC CHO QUY TRÌNH XÁC THỰC 2 BƯỚC ---
+        let registrationType = ''; // 'student' hoặc 'guest'
+        let tempRegistrationData = {}; // Lưu trữ dữ liệu form tạm thời trước khi OTP thành công
+        
         let currentOtpStep = ''; // 'sms' hoặc 'email'
         let smsOtpCode = '';
         let emailOtpCode = '';
@@ -494,15 +510,14 @@
 
         // HÀM BẮT ĐẦU ĐẾM NGƯỢC THỜI GIAN
         function startOtpTimers() {
-            clearInterval(countdownInterval); // Xóa bộ đếm cũ nếu có
-            otpTimestamp = Date.now(); // Lưu thời điểm bắt đầu
+            clearInterval(countdownInterval); 
+            otpTimestamp = Date.now(); 
             
             const timerEl = document.getElementById('otp-timer');
             const resendBtn = document.getElementById('btn-resend-otp');
             const inputOtp = document.getElementById('input-otp');
             const submitBtn = document.getElementById('btn-submit-otp');
             
-            // Khởi tạo trạng thái ban đầu
             resendBtn.disabled = true;
             inputOtp.disabled = false;
             submitBtn.disabled = false;
@@ -512,7 +527,6 @@
             countdownInterval = setInterval(() => {
                 let elapsed = Math.floor((Date.now() - otpTimestamp) / 1000);
                 
-                // 1. Xử lý đếm ngược 5 phút (300 giây) hết hạn
                 let remaining = 300 - elapsed; 
                 if (remaining <= 0) {
                     clearInterval(countdownInterval);
@@ -526,7 +540,6 @@
                     timerEl.innerHTML = `<i class="far fa-clock mr-1"></i> Hiệu lực: ${m}:${s}`;
                 }
 
-                // 2. Xử lý đếm ngược 60 giây nút Gửi lại mã
                 let resendRemaining = 60 - elapsed; 
                 if (resendRemaining <= 0 && remaining > 0) {
                     resendBtn.disabled = false;
@@ -549,12 +562,12 @@
             if (currentOtpStep === 'sms') {
                 smsOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
                 const macroId = "a9b42a0f-ffd0-4578-9fd7-d5fd6be9d80d";
-                const macroUrl = `https://trigger.macrodroid.com/${macroId}/send_otp?phone=${encodeURIComponent(guestTempData.phone)}&otp=${smsOtpCode}&t=${new Date().getTime()}`;
+                const macroUrl = `https://trigger.macrodroid.com/${macroId}/send_otp?phone=${encodeURIComponent(tempRegistrationData.phone)}&otp=${smsOtpCode}&t=${new Date().getTime()}`;
                 
                 fetch(macroUrl, { method: 'GET', mode: 'no-cors', cache: 'no-store' });
                 
                 const gasUrl = "https://script.google.com/macros/s/AKfycbxGTEalH-yos3juQ6jKdVWC6gus5cDqry8VoeoM3EIO2jX8NNjyBbo6_HdUthaf0s-hQg/exec";
-                fetch(`${gasUrl}?phone=${encodeURIComponent(guestTempData.phone)}&otp=${smsOtpCode}&t=${new Date().getTime()}`, { method: 'GET', mode: 'no-cors', cache: 'no-store' });
+                fetch(`${gasUrl}?phone=${encodeURIComponent(tempRegistrationData.phone)}&otp=${smsOtpCode}&t=${new Date().getTime()}`, { method: 'GET', mode: 'no-cors', cache: 'no-store' });
 
                 startOtpTimers();
                 showToast("Đã gửi lại mã SMS mới!", "success");
@@ -571,7 +584,7 @@
                             service_id: 'service_arypin9', 
                             template_id: 'template_g7k2h2r', 
                             user_id: 'vC9HO0JtM7CI1HAu5', 
-                            template_params: { email: guestTempData.email, passcode: emailOtpCode, time: timeString } 
+                            template_params: { email: tempRegistrationData.email, passcode: emailOtpCode, time: timeString } 
                         })
                     });
                     startOtpTimers();
@@ -701,7 +714,9 @@
             }
         });
 
-        // --- ĐĂNG KÝ HỌC SINH ---
+        // ==========================================
+        // QUY TRÌNH XÁC THỰC 2 BƯỚC CHO HỌC SINH
+        // ==========================================
         document.getElementById('form-register-student').addEventListener('submit', async (e) => {
             e.preventDefault();
             if(!currentUser) return;
@@ -709,75 +724,100 @@
             const phone = document.getElementById('st-input-phone').value.trim();
             const email = document.getElementById('st-input-email').value.trim();
             
-            const btn = e.target.querySelector('button[type="submit"]');
-            const originalBtnHTML = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-3"></i> Đang kiểm tra...';
-            btn.disabled = true;
+            tempRegistrationData = { ...foundStudentData, phone: phone, email: email };
+            registrationType = 'student';
 
-            try {
-                const emailQuery = query(collection(db, 'students'), where('email', '==', email));
-                const querySnapshot = await getDocs(emailQuery);
-                
-                if (!querySnapshot.empty) {
-                    showToast("Email này đã được đăng ký cho một thẻ thư viện khác!");
-                    btn.innerHTML = originalBtnHTML;
-                    btn.disabled = false;
-                    return;
-                }
-
-                const fullData = {
-                    name: foundStudentData.name, 
-                    class: foundStudentData.class, 
-                    studentId: foundStudentData.studentId, 
-                    phone: phone, 
-                    email: email, 
-                    createdAt: new Date().toISOString()
-                };
-
-                await setDoc(doc(collection(db, 'students'), foundStudentData.studentId), fullData);
-                showDigitalCard(fullData, 'student');
-                Swal.fire({ title: "Đăng ký thành công!", text: "Email đã được gắn cố định với thẻ này.", icon: "success", confirmButtonColor: '#3b82f6' });
-            } catch (err) { 
-                showToast("Lỗi khi lưu: " + err.message); 
-            } finally {
-                btn.innerHTML = originalBtnHTML;
-                btn.disabled = false;
-            }
-        });
-
-        // ==========================================
-        // QUY TRÌNH XÁC THỰC 2 BƯỚC KHÁCH NGOÀI
-        // ==========================================
-
-        // BƯỚC 1: SUBMIT FORM THÔNG TIN -> KIỂM TRA DATABASE -> GỬI SMS
-        document.getElementById('form-register-guest').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            guestTempData = { 
-                name: document.getElementById('g-input-name').value.trim(), 
-                email: document.getElementById('g-input-email').value.trim(), 
-                phone: document.getElementById('g-input-phone').value.trim() 
-            };
-
-            const btnText = document.getElementById('text-start-verify');
-            const btnLoad = document.getElementById('load-start-verify');
-            const btnSubmit = document.getElementById('btn-start-verify');
+            const btnText = document.getElementById('text-start-verify-st');
+            const btnLoad = document.getElementById('load-start-verify-st');
+            const btnSubmit = document.getElementById('btn-start-verify-st');
 
             btnText.style.display = 'none';
             btnLoad.classList.remove('hidden');
             btnSubmit.disabled = true;
 
             try {
-                // Kiểm tra xem Email đã tồn tại chưa
-                const emailQuery = query(collection(db, 'guests'), where('email', '==', guestTempData.email));
+                // Kiểm tra Email tồn tại trong bảng học sinh
+                const emailQuery = query(collection(db, 'students'), where('email', '==', email));
                 const emailSnap = await getDocs(emailQuery);
                 if (!emailSnap.empty) {
-                    Swal.fire({ title: "Email đã tồn tại", text: "Email này đã được dùng để đăng ký thẻ khách trước đây. Vui lòng sử dụng email khác.", icon: "warning", confirmButtonColor: '#3b82f6' });
+                    Swal.fire({ title: "Email đã tồn tại", text: "Email này đã được đăng ký cho một thẻ thư viện khác!", icon: "warning", confirmButtonColor: '#3b82f6' });
                     return;
                 }
 
-                // Kiểm tra xem Số điện thoại đã tồn tại chưa
-                const phoneQuery = query(collection(db, 'guests'), where('phone', '==', guestTempData.phone));
+                // Kiểm tra SĐT tồn tại trong bảng học sinh
+                const phoneQuery = query(collection(db, 'students'), where('phone', '==', phone));
+                const phoneSnap = await getDocs(phoneQuery);
+                if (!phoneSnap.empty) {
+                    Swal.fire({ title: "SĐT đã tồn tại", text: "Số điện thoại này đã được gắn với một thẻ học sinh khác.", icon: "warning", confirmButtonColor: '#3b82f6' });
+                    return;
+                }
+
+                // TẠO MÃ SMS OTP
+                smsOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
+                
+                const macroId = "a9b42a0f-ffd0-4578-9fd7-d5fd6be9d80d";
+                const macroUrl = `https://trigger.macrodroid.com/${macroId}/send_otp?phone=${encodeURIComponent(phone)}&otp=${smsOtpCode}&t=${new Date().getTime()}`;
+                
+                fetch(macroUrl, { method: 'GET', mode: 'no-cors', cache: 'no-store' });
+                
+                const gasUrl = "https://script.google.com/macros/s/AKfycbxGTEalH-yos3juQ6jKdVWC6gus5cDqry8VoeoM3EIO2jX8NNjyBbo6_HdUthaf0s-hQg/exec";
+                fetch(`${gasUrl}?phone=${encodeURIComponent(phone)}&otp=${smsOtpCode}&t=${new Date().getTime()}`, { method: 'GET', mode: 'no-cors', cache: 'no-store' });
+
+                // CẤU HÌNH GIAO DIỆN OTP (BƯỚC 1: SMS)
+                currentOtpStep = 'sms';
+                document.getElementById('otp-step-badge').innerText = 'BƯỚC 1/2: XÁC THỰC SĐT';
+                document.getElementById('otp-step-badge').className = 'mb-5 inline-block bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-xs font-bold tracking-wider border border-blue-100';
+                document.getElementById('otp-icon').className = 'fas fa-sms text-3xl text-blue-600';
+                document.getElementById('otp-title').innerText = 'Mã xác thực SMS';
+                document.getElementById('display-target').innerText = phone;
+                document.getElementById('input-otp').value = '';
+                
+                showToast("Mã OTP đang được gửi đến SĐT của bạn!", "success");
+                showView('view-otp');
+                startOtpTimers();
+
+            } catch (err) {
+                console.error("Lỗi:", err);
+                Swal.fire({ title: "Lỗi", text: "Có lỗi xảy ra, vui lòng thử lại.", icon: "error", confirmButtonColor: '#3b82f6' });
+            } finally {
+                btnText.style.display = 'flex';
+                btnLoad.classList.add('hidden');
+                btnSubmit.disabled = false;
+            }
+        });
+
+        // ==========================================
+        // QUY TRÌNH XÁC THỰC 2 BƯỚC KHÁCH NGOÀI
+        // ==========================================
+        document.getElementById('form-register-guest').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            tempRegistrationData = { 
+                name: document.getElementById('g-input-name').value.trim(), 
+                email: document.getElementById('g-input-email').value.trim(), 
+                phone: document.getElementById('g-input-phone').value.trim() 
+            };
+            registrationType = 'guest';
+
+            const btnText = document.getElementById('text-start-verify-guest');
+            const btnLoad = document.getElementById('load-start-verify-guest');
+            const btnSubmit = document.getElementById('btn-start-verify-guest');
+
+            btnText.style.display = 'none';
+            btnLoad.classList.remove('hidden');
+            btnSubmit.disabled = true;
+
+            try {
+                // Kiểm tra Email khách
+                const emailQuery = query(collection(db, 'guests'), where('email', '==', tempRegistrationData.email));
+                const emailSnap = await getDocs(emailQuery);
+                if (!emailSnap.empty) {
+                    Swal.fire({ title: "Email đã tồn tại", text: "Email này đã được dùng để đăng ký thẻ khách trước đây.", icon: "warning", confirmButtonColor: '#3b82f6' });
+                    return;
+                }
+
+                // Kiểm tra SĐT khách
+                const phoneQuery = query(collection(db, 'guests'), where('phone', '==', tempRegistrationData.phone));
                 const phoneSnap = await getDocs(phoneQuery);
                 if (!phoneSnap.empty) {
                     Swal.fire({ title: "SĐT đã tồn tại", text: "Số điện thoại này đã được gắn với một thẻ khác.", icon: "warning", confirmButtonColor: '#3b82f6' });
@@ -788,15 +828,11 @@
                 smsOtpCode = Math.floor(100000 + Math.random() * 900000).toString();
                 
                 const macroId = "a9b42a0f-ffd0-4578-9fd7-d5fd6be9d80d";
-                const macroUrl = `https://trigger.macrodroid.com/${macroId}/send_otp?phone=${encodeURIComponent(guestTempData.phone)}&otp=${smsOtpCode}&t=${new Date().getTime()}`;
-                
-                // Gọi điện thoại gửi SMS ngay lập tức
+                const macroUrl = `https://trigger.macrodroid.com/${macroId}/send_otp?phone=${encodeURIComponent(tempRegistrationData.phone)}&otp=${smsOtpCode}&t=${new Date().getTime()}`;
                 fetch(macroUrl, { method: 'GET', mode: 'no-cors', cache: 'no-store' });
 
-                // Vẫn gọi Google Script để lưu vào file Sheet lịch sử
                 const gasUrl = "https://script.google.com/macros/s/AKfycbxGTEalH-yos3juQ6jKdVWC6gus5cDqry8VoeoM3EIO2jX8NNjyBbo6_HdUthaf0s-hQg/exec";
-                const gasReqUrl = `${gasUrl}?phone=${encodeURIComponent(guestTempData.phone)}&otp=${smsOtpCode}&t=${new Date().getTime()}`;
-                fetch(gasReqUrl, { method: 'GET', mode: 'no-cors', cache: 'no-store' });
+                fetch(`${gasUrl}?phone=${encodeURIComponent(tempRegistrationData.phone)}&otp=${smsOtpCode}&t=${new Date().getTime()}`, { method: 'GET', mode: 'no-cors', cache: 'no-store' });
 
                 // CẤU HÌNH GIAO DIỆN OTP CHO BƯỚC 1 (SMS)
                 currentOtpStep = 'sms';
@@ -804,13 +840,11 @@
                 document.getElementById('otp-step-badge').className = 'mb-5 inline-block bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-xs font-bold tracking-wider border border-blue-100';
                 document.getElementById('otp-icon').className = 'fas fa-sms text-3xl text-blue-600';
                 document.getElementById('otp-title').innerText = 'Mã xác thực SMS';
-                document.getElementById('display-target').innerText = guestTempData.phone;
+                document.getElementById('display-target').innerText = tempRegistrationData.phone;
                 document.getElementById('input-otp').value = '';
                 
                 showToast("Mã OTP đang được gửi đến SĐT của bạn!", "success");
                 showView('view-otp');
-                
-                // Kích hoạt bộ đếm thời gian
                 startOtpTimers();
 
             } catch (err) {
@@ -823,7 +857,9 @@
             }
         });
 
-        // BƯỚC 2 & 3: XỬ LÝ NHẬP MÃ OTP VÀ XÁC NHẬN
+        // ==========================================
+        // BƯỚC 2 & 3: XỬ LÝ NHẬP MÃ OTP VÀ XÁC NHẬN CHO CẢ 2 LOẠI
+        // ==========================================
         document.getElementById('form-verify-otp').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -833,6 +869,12 @@
             }
 
             const inputVal = document.getElementById('input-otp').value.trim();
+            
+            // --- KIỂM TRA ĐỘ DÀI CHUỖI OTP NHẬP VÀO ---
+            if (inputVal.length !== 6) {
+                return showToast("Vui lòng nhập đủ 6 chữ số OTP!");
+            }
+
             const btnOtpSubmit = document.getElementById('btn-submit-otp');
             const originalOtpText = document.getElementById('text-submit-otp').innerHTML;
 
@@ -855,7 +897,7 @@
                             service_id: 'service_arypin9', 
                             template_id: 'template_g7k2h2r', 
                             user_id: 'vC9HO0JtM7CI1HAu5', 
-                            template_params: { email: guestTempData.email, passcode: emailOtpCode, time: timeString } 
+                            template_params: { email: tempRegistrationData.email, passcode: emailOtpCode, time: timeString } 
                         })
                     });
                     
@@ -867,13 +909,12 @@
                     document.getElementById('otp-step-badge').className = 'mb-5 inline-block bg-orange-50 text-orange-600 px-4 py-1.5 rounded-full text-xs font-bold tracking-wider border border-orange-100';
                     document.getElementById('otp-icon').className = 'fas fa-envelope-open-text text-3xl text-orange-500';
                     document.getElementById('otp-title').innerText = 'Mã xác thực Email';
-                    document.getElementById('display-target').innerText = guestTempData.email;
+                    document.getElementById('display-target').innerText = tempRegistrationData.email;
                     document.getElementById('display-target').className = 'text-orange-600 tracking-wider';
                     document.getElementById('input-otp').value = '';
                     
                     Swal.fire({ title: "SĐT đã được xác thực!", text: "Tuyệt vời. Hệ thống vừa gửi mã xác thực thứ 2 đến Email của bạn để hoàn tất.", icon: "success", confirmButtonColor: '#3b82f6' });
 
-                    // Kích hoạt lại bộ đếm cho phần Email
                     startOtpTimers();
 
                 } catch (err) {
@@ -887,25 +928,45 @@
             else if (currentOtpStep === 'email') {
                 if (inputVal !== emailOtpCode) return showToast("Mã OTP Email không chính xác!");
                 
-                // MÃ EMAIL ĐÚNG -> LƯU VÀO DATABASE VÀ CẤP THẺ
+                // MÃ EMAIL ĐÚNG -> PHÂN LOẠI VÀ LƯU VÀO DATABASE
                 btnOtpSubmit.innerHTML = '<i class="fas fa-spinner fa-spin mr-3"></i> Đang tạo thẻ...';
                 btnOtpSubmit.disabled = true;
 
                 try {
-                    const guestId = `GUEST${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
-                    const fullData = {
-                        name: guestTempData.name, 
-                        phone: guestTempData.phone, 
-                        email: guestTempData.email, 
-                        createdAt: new Date().toISOString()
-                    };
+                    clearInterval(countdownInterval); // Dừng đếm ngược
+                    
+                    // --- NẾU LÀ HỌC SINH ---
+                    if (registrationType === 'student') {
+                        const fullData = {
+                            name: tempRegistrationData.name, 
+                            class: tempRegistrationData.class, 
+                            studentId: tempRegistrationData.studentId, 
+                            phone: tempRegistrationData.phone, 
+                            email: tempRegistrationData.email, 
+                            createdAt: new Date().toISOString()
+                        };
 
-                    await setDoc(doc(collection(db, 'guests'), guestId), fullData);
-                    clearInterval(countdownInterval); // Dừng đếm ngược khi đã hoàn thành
-                    showDigitalCard(fullData, 'guest', guestId);
-                    Swal.fire({ title: "Đăng ký thành công!", text: `Mã thẻ của bạn là ${guestId}. Vui lòng lưu lại thẻ này!`, icon: "success", confirmButtonColor: '#3b82f6' });
+                        await setDoc(doc(collection(db, 'students'), tempRegistrationData.studentId), fullData);
+                        showDigitalCard(fullData, 'student');
+                        Swal.fire({ title: "Đăng ký thành công!", text: "SĐT và Email đã được xác thực, liên kết an toàn với thẻ của bạn.", icon: "success", confirmButtonColor: '#3b82f6' });
+                    } 
+                    // --- NẾU LÀ KHÁCH NGOÀI ---
+                    else if (registrationType === 'guest') {
+                        const guestId = `GUEST${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+                        const fullData = {
+                            name: tempRegistrationData.name, 
+                            phone: tempRegistrationData.phone, 
+                            email: tempRegistrationData.email, 
+                            createdAt: new Date().toISOString()
+                        };
+
+                        await setDoc(doc(collection(db, 'guests'), guestId), fullData);
+                        showDigitalCard(fullData, 'guest', guestId);
+                        Swal.fire({ title: "Đăng ký thành công!", text: `Mã thẻ của bạn là ${guestId}. Vui lòng lưu lại thẻ này!`, icon: "success", confirmButtonColor: '#3b82f6' });
+                    }
+
                 } catch (err) { 
-                    showToast("Lỗi khi đăng ký khách: " + err.message); 
+                    showToast("Lỗi khi đăng ký: " + err.message); 
                 } finally {
                     btnOtpSubmit.innerHTML = `<span id="text-submit-otp">${originalOtpText}</span>`;
                     btnOtpSubmit.disabled = false;
@@ -922,11 +983,15 @@
         });
         document.getElementById('btn-to-guest').addEventListener('click', () => showView('view-guest-form'));
         
-        // NÚT ĐỔI THÔNG TIN (QUAY LẠI TỪ MÀN HÌNH OTP)
-        document.getElementById('btn-back-to-guest').addEventListener('click', () => {
+        // NÚT ĐỔI THÔNG TIN (QUAY LẠI TỪ MÀN HÌNH OTP DÀNH CHO CẢ 2 LOẠI)
+        document.getElementById('btn-back-from-otp').addEventListener('click', () => {
             currentOtpStep = ''; 
             clearInterval(countdownInterval);
-            showView('view-guest-form');
+            if (registrationType === 'student') {
+                showView('view-student-form');
+            } else {
+                showView('view-guest-form');
+            }
         });
 
         // Nút "Quay về trang chủ" Ở MÀN HÌNH DIGITAL CARD -> Chuyển hướng tới trang studentpage.html
