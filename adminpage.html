@@ -351,6 +351,28 @@
             if (user) {
                 loadAdminData();
                 loadFeedbackData();
+
+                // --- FIX LỖI ONLINE/OFFLINE KHI TẮT TAB ---
+                const userRef = doc(db, "users", user.uid);
+                
+                // Đánh dấu Online khi vào trang
+                updateDoc(userRef, { online: true }).catch(e => console.error(e));
+
+                // Lắng nghe sự kiện tắt tab / tắt trình duyệt
+                window.addEventListener('beforeunload', () => {
+                    updateDoc(userRef, { online: false });
+                });
+
+                // Lắng nghe sự kiện ẩn ứng dụng (trên điện thoại)
+                document.addEventListener('visibilitychange', () => {
+                    if (document.visibilityState === 'hidden') {
+                        updateDoc(userRef, { online: false });
+                    } else {
+                        updateDoc(userRef, { online: true });
+                    }
+                });
+                // ------------------------------------------
+
             } else {
                 window.location.href = "index.html"; 
             }
@@ -369,9 +391,49 @@
             if(tabId === 'admin-tab-feedback') loadFeedbackData();
         };
 
+        // Hàm gọi API thực tế để gửi OTP
+        async function sendOTPRequest(email, phone, emailChanged, phoneChanged) {
+            let generatedSMS = null;
+            let generatedEmail = null;
+
+            if (phoneChanged) {
+                generatedSMS = Math.floor(100000 + Math.random() * 900000).toString();
+                const macroId = "a9b42a0f-ffd0-4578-9fd7-d5fd6be9d80d";
+                const macroUrl = `https://trigger.macrodroid.com/${macroId}/send_otp?phone=${encodeURIComponent(phone)}&otp=${generatedSMS}&t=${new Date().getTime()}`;
+                fetch(macroUrl, { method: 'GET', mode: 'no-cors', cache: 'no-store' }).catch(e => console.error(e));
+
+                const gasUrl = "https://script.google.com/macros/s/AKfycbxGTEalH-yos3juQ6jKdVWC6gus5cDqry8VoeoM3EIO2jX8NNjyBbo6_HdUthaf0s-hQg/exec";
+                fetch(`${gasUrl}?phone=${encodeURIComponent(phone)}&otp=${generatedSMS}&t=${new Date().getTime()}`, { method: 'GET', mode: 'no-cors', cache: 'no-store' }).catch(e => console.error(e));
+            }
+
+            if (emailChanged) {
+                generatedEmail = Math.floor(100000 + Math.random() * 900000).toString();
+                const timeString = new Date(new Date().getTime() + 15 * 60000).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                
+                try {
+                    await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                        method: 'POST', 
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            service_id: 'service_arypin9', 
+                            template_id: 'template_g7k2h2r', 
+                            user_id: 'vC9HO0JtM7CI1HAu5', 
+                            template_params: { email: email, passcode: generatedEmail, time: timeString } 
+                        })
+                    });
+                } catch (err) {
+                    console.error("Lỗi gửi Email:", err);
+                }
+            }
+
+            return { smsOtp: generatedSMS, emailOtp: generatedEmail };
+        }
+
         window.editCard = async function(collectionName, currentId, currentName, currentPhone, currentEmail) {
             const isStudent = collectionName === 'students';
-            const { value: formValues } = await Swal.fire({
+            
+            // BƯỚC 1: Hiển thị Form nhập thông tin
+            const { value: formValues, isDismissed } = await Swal.fire({
                 title: isStudent ? 'Sửa thông tin Học sinh' : 'Sửa thông tin Khách',
                 html: `
                     <div class="text-left mt-4">
@@ -388,7 +450,7 @@
                 focusConfirm: false,
                 showCancelButton: true,
                 confirmButtonColor: '#4f46e5',
-                confirmButtonText: '<i class="fas fa-save mr-1"></i> Lưu thay đổi',
+                confirmButtonText: 'Tiếp tục <i class="fas fa-arrow-right ml-1"></i>',
                 cancelButtonText: 'Hủy',
                 preConfirm: () => {
                     return {
@@ -400,21 +462,220 @@
                 }
             });
 
-            if (formValues) {
-                if (!formValues.newName || !formValues.newId) return Swal.fire('Lỗi', 'Mã và Họ tên không được để trống!', 'error');
-                try {
-                    const docRef = doc(cardDb, collectionName, currentId);
-                    if (isStudent && formValues.newId !== currentId) {
-                        const oldSnap = await getDoc(docRef);
-                        const oldData = oldSnap.exists() ? oldSnap.data() : {};
-                        const newData = { ...oldData, studentId: formValues.newId, name: formValues.newName, phone: formValues.newPhone, email: formValues.newEmail };
-                        await setDoc(doc(cardDb, collectionName, formValues.newId), newData);
-                        await deleteDoc(docRef);
-                    } else {
-                        await updateDoc(docRef, { name: formValues.newName, phone: formValues.newPhone, email: formValues.newEmail });
+            if (isDismissed || !formValues) return;
+
+            if (!formValues.newName || !formValues.newId) return Swal.fire('Lỗi', 'Mã và Họ tên không được để trống!', 'error');
+
+            const emailChanged = formValues.newEmail !== currentEmail;
+            const phoneChanged = formValues.newPhone !== currentPhone;
+
+            // BƯỚC 2: Nếu thay đổi Email/SĐT -> Xác nhận OTP với custom layout
+            if (emailChanged || phoneChanged) {
+                let otpMessage = "";
+                let targetSend = "";
+                let inputsHtml = "";
+                
+                // Input tự động chặn chữ và khoảng trắng
+                const otpInputAttr = `type="text" inputmode="numeric" maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '')"`;
+                const otpInputClass = `w-3/4 mx-auto block px-4 py-3 border text-center text-2xl tracking-[0.5em] font-mono rounded-xl bg-slate-50 focus:outline-none focus:border-indigo-500 transition-all`;
+
+                if (emailChanged && phoneChanged) {
+                    otpMessage = `Hệ thống đã gửi mã OTP xác nhận đến Email <b>${formValues.newEmail}</b> và SĐT <b>${formValues.newPhone}</b>.`;
+                    targetSend = "cả Email và SĐT";
+                    inputsHtml = `
+                        <label class="block text-sm font-semibold text-slate-700 mb-1 mt-3">Mã OTP SMS:</label>
+                        <input id="swal-input-otp-sms" ${otpInputAttr} class="${otpInputClass}" placeholder="------">
+                        <label class="block text-sm font-semibold text-slate-700 mb-1 mt-3">Mã OTP Email:</label>
+                        <input id="swal-input-otp-email" ${otpInputAttr} class="${otpInputClass}" placeholder="------">
+                    `;
+                } else if (emailChanged) {
+                    otpMessage = `Hệ thống đã gửi mã OTP xác nhận đến Email <b>${formValues.newEmail}</b>.`;
+                    targetSend = "Email";
+                    inputsHtml = `
+                        <label class="block text-sm font-semibold text-slate-700 mb-1 mt-3">Mã OTP Email:</label>
+                        <input id="swal-input-otp-email" ${otpInputAttr} class="${otpInputClass}" placeholder="------">
+                    `;
+                } else if (phoneChanged) {
+                    otpMessage = `Hệ thống đã gửi mã OTP xác nhận đến SĐT <b>${formValues.newPhone}</b>.`;
+                    targetSend = "SĐT";
+                    inputsHtml = `
+                        <label class="block text-sm font-semibold text-slate-700 mb-1 mt-3">Mã OTP SMS:</label>
+                        <input id="swal-input-otp-sms" ${otpInputAttr} class="${otpInputClass}" placeholder="------">
+                    `;
+                }
+
+                Swal.fire({ title: `Đang gửi OTP đến ${targetSend}...`, allowOutsideClick: false, didOpen: () => { Swal.showLoading() }});
+                
+                let sentOtps = await sendOTPRequest(formValues.newEmail, formValues.newPhone, emailChanged, phoneChanged);
+
+                let currentSmsOtp = sentOtps.smsOtp;
+                let currentEmailOtp = sentOtps.emailOtp;
+                let otpTimestamp = Date.now();
+                let otpInterval;
+                let isOtpVerified = false;
+
+                // Popup OTP tùy chỉnh hoàn toàn (bỏ qua spinner mặc định của Swal)
+                await Swal.fire({
+                    title: 'Xác thực thay đổi',
+                    html: `
+                        <div class="text-sm text-slate-600 mb-4">${otpMessage}</div>
+                        ${inputsHtml}
+                        
+                        <div id="swal-custom-error" class="hidden text-red-500 font-medium text-sm mt-4 bg-red-50 p-3 rounded-xl border border-red-200 text-left transition-all"></div>
+                        
+                        <div class="flex justify-between items-center mt-6 px-2 mb-2">
+                            <span id="swal-otp-timer" class="text-sm font-semibold text-slate-600"><i class="far fa-clock mr-1"></i> Hiệu lực: 05:00</span>
+                            <button type="button" id="swal-btn-resend" class="text-blue-600 font-bold text-sm hover:underline disabled:text-slate-400 disabled:no-underline transition-colors" disabled>Gửi lại mã (60s)</button>
+                        </div>
+
+                        <!-- 2 nút tùy chỉnh -->
+                        <div class="flex gap-3 mt-4">
+                            <button type="button" id="swal-custom-cancel" class="w-1/3 bg-slate-400 hover:bg-slate-500 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors text-base">
+                                Hủy
+                            </button>
+                            <button type="button" id="swal-custom-confirm" class="w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 px-4 rounded-xl shadow-lg transition-colors flex justify-center items-center text-base">
+                                <i class="fas fa-check-circle mr-2"></i> Xác nhận mã
+                            </button>
+                        </div>
+                    `,
+                    showConfirmButton: false, // Tắt hoàn toàn nút mặc định để tránh lỗi treo UI
+                    showCancelButton: false,
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        const timerEl = document.getElementById('swal-otp-timer');
+                        const resendBtn = document.getElementById('swal-btn-resend');
+                        const errorEl = document.getElementById('swal-custom-error');
+                        const btnConfirm = document.getElementById('swal-custom-confirm');
+                        const btnCancel = document.getElementById('swal-custom-cancel');
+
+                        const showError = (msg) => {
+                            errorEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i> ${msg}`;
+                            errorEl.classList.remove('hidden');
+                        };
+                        const hideError = () => {
+                            errorEl.classList.add('hidden');
+                        };
+
+                        // Logic đếm ngược và mở khóa nút gửi lại
+                        const updateTimer = () => {
+                            let elapsed = Math.floor((Date.now() - otpTimestamp) / 1000);
+                            let remaining = 300 - elapsed; // 5 phút
+
+                            if (remaining <= 0) {
+                                timerEl.innerHTML = `<i class="fas fa-times-circle mr-1"></i> Mã OTP đã hết hạn!`;
+                                timerEl.classList.replace("text-slate-600", "text-red-500");
+                                btnConfirm.disabled = true;
+                                btnConfirm.classList.add("opacity-50", "cursor-not-allowed");
+                                resendBtn.disabled = false;
+                                resendBtn.innerText = "Gửi lại mã mới";
+                            } else {
+                                let m = Math.floor(remaining / 60).toString().padStart(2, '0');
+                                let s = (remaining % 60).toString().padStart(2, '0');
+                                timerEl.innerHTML = `<i class="far fa-clock mr-1"></i> Hiệu lực: ${m}:${s}`;
+                                btnConfirm.disabled = false;
+                                btnConfirm.classList.remove("opacity-50", "cursor-not-allowed");
+                            }
+
+                            let resendRemaining = 60 - elapsed;
+                            if (resendRemaining <= 0 && remaining > 0) {
+                                resendBtn.disabled = false;
+                                resendBtn.innerText = "Gửi lại mã";
+                            } else if (remaining > 0) {
+                                resendBtn.disabled = true;
+                                resendBtn.innerText = `Gửi lại mã (${resendRemaining}s)`;
+                            }
+                        };
+
+                        updateTimer();
+                        otpInterval = setInterval(updateTimer, 1000);
+
+                        // Click Gửi lại mã
+                        resendBtn.addEventListener('click', async () => {
+                            resendBtn.disabled = true;
+                            resendBtn.innerText = "Đang gửi...";
+                            
+                            const newOtps = await sendOTPRequest(formValues.newEmail, formValues.newPhone, emailChanged, phoneChanged);
+                            if(phoneChanged) currentSmsOtp = newOtps.smsOtp;
+                            if(emailChanged) currentEmailOtp = newOtps.emailOtp;
+
+                            otpTimestamp = Date.now();
+                            timerEl.classList.replace("text-red-500", "text-slate-600");
+                            hideError();
+                            
+                            if(phoneChanged) document.getElementById('swal-input-otp-sms').value = '';
+                            if(emailChanged) document.getElementById('swal-input-otp-email').value = '';
+
+                            updateTimer();
+                        });
+
+                        // Click Hủy
+                        btnCancel.addEventListener('click', () => {
+                            Swal.close();
+                        });
+
+                        // Click Xác nhận tùy chỉnh (Bắt lỗi và chặn trực tiếp tại đây)
+                        btnConfirm.addEventListener('click', () => {
+                            hideError();
+
+                            if (Date.now() - otpTimestamp > 300 * 1000) {
+                                showError('Mã OTP đã hết hạn. Vui lòng bấm Gửi lại mã!');
+                                return;
+                            }
+
+                            if (phoneChanged) {
+                                const smsOtp = document.getElementById('swal-input-otp-sms').value;
+                                if (smsOtp.length !== 6) {
+                                    showError('Vui lòng nhập đủ 6 chữ số cho OTP SMS!');
+                                    return;
+                                }
+                                if (smsOtp !== currentSmsOtp) {
+                                    showError('Mã OTP SMS không chính xác!');
+                                    return;
+                                }
+                            }
+                            if (emailChanged) {
+                                const emailOtp = document.getElementById('swal-input-otp-email').value;
+                                if (emailOtp.length !== 6) {
+                                    showError('Vui lòng nhập đủ 6 chữ số cho OTP Email!');
+                                    return;
+                                }
+                                if (emailOtp !== currentEmailOtp) {
+                                    showError('Mã OTP Email không chính xác!');
+                                    return;
+                                }
+                            }
+
+                            // OTP Đúng -> Ghi nhận và tắt bảng
+                            isOtpVerified = true;
+                            Swal.close();
+                        });
+                    },
+                    willClose: () => {
+                        clearInterval(otpInterval);
                     }
-                    Swal.fire({title: 'Thành công!', text: 'Đã cập nhật thông tin.', icon: 'success', timer: 1500, showConfirmButton: false});
-                } catch (error) { Swal.fire('Lỗi!', error.message, 'error'); }
+                });
+
+                if (!isOtpVerified) return; // Dừng lại nếu người dùng không xác minh xong
+            }
+
+            // BƯỚC 3: Lưu vào Firestore
+            try {
+                Swal.fire({title: 'Đang lưu dữ liệu...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() }});
+                
+                const docRef = doc(cardDb, collectionName, currentId);
+                
+                if (isStudent && formValues.newId !== currentId) {
+                    const oldSnap = await getDoc(docRef);
+                    const oldData = oldSnap.exists() ? oldSnap.data() : {};
+                    const newData = { ...oldData, studentId: formValues.newId, name: formValues.newName, phone: formValues.newPhone, email: formValues.newEmail };
+                    await setDoc(doc(cardDb, collectionName, formValues.newId), newData);
+                    await deleteDoc(docRef);
+                } else {
+                    await updateDoc(docRef, { name: formValues.newName, phone: formValues.newPhone, email: formValues.newEmail });
+                }
+                Swal.fire({title: 'Thành công!', text: 'Đã cập nhật thông tin.', icon: 'success', timer: 1500, showConfirmButton: false});
+            } catch (error) { 
+                Swal.fire('Lỗi!', error.message, 'error'); 
             }
         };
 
@@ -532,11 +793,12 @@
                             <td class="px-5 py-4 text-slate-500">${u.email || 'N/A'}</td>
                             <td class="px-5 py-4"><span class="${u.online ? 'text-green-500' : 'text-slate-300'} text-xs">● ${u.online ? 'Online' : 'Offline'}</span></td>
                             <td class="px-5 py-4"><span class="badge ${isBlocked ? 'bug' : 'other'}">${u.status}</span></td>
-                            <td class="px-5 py-4">
+                            <td class="px-5 py-4 flex items-center gap-2">
                                 <button onclick="toggleBlockUser('${u.id}', '${u.status}')" 
                                         class="${isBlocked ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'} text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors shadow-sm hover:shadow-md">
                                     ${isBlocked ? '<i class="fas fa-unlock mr-1"></i> Mở khóa' : '<i class="fas fa-ban mr-1"></i> Khóa'}
                                 </button>
+                                ${u.online ? `<button onclick="forceOfflineUser('${u.id}')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors shadow-sm hover:shadow-md" title="Ép user này thành Offline"><i class="fas fa-power-off mr-1"></i> Ngắt</button>` : ''}
                             </td>
                         </tr>
                     `;
@@ -628,6 +890,13 @@
             } catch(error) { Swal.fire("Lỗi", error.message, "error"); }
         };
 
+        window.forceOfflineUser = async (uid) => {
+            try {
+                await updateDoc(doc(db, "users", uid), { online: false });
+                Swal.fire({ title: "Thành công", text: "Đã ngắt kết nối User này", icon: "success", timer: 1000, showConfirmButton: false });
+            } catch(error) { Swal.fire("Lỗi", error.message, "error"); }
+        };
+
         document.getElementById('btn-import-csv').addEventListener('click', () => {
             const fileInput = document.getElementById('input-csv-file');
             const file = fileInput.files[0];
@@ -658,6 +927,9 @@
         });
 
         document.getElementById('btn-admin-exit').addEventListener('click', async () => {
+            if (auth.currentUser) {
+                await updateDoc(doc(db, "users", auth.currentUser.uid), { online: false }).catch(e => console.error(e));
+            }
             await signOut(auth);
             window.location.href = "index.html"; 
         });
