@@ -149,9 +149,9 @@
                 
                 <div class="nav">
                     <button class="menu-btn active" onclick="switchAdminTab('admin-tab-overview', this)"><i class="fas fa-chart-bar w-5 mr-1 text-center"></i> Quản lý Thẻ</button>
-                    <button class="menu-btn" onclick="switchAdminTab('admin-tab-feedback', this)"><i class="fas fa-comments w-5 mr-1 text-center"></i> Feedback</button>
                     <button class="menu-btn" onclick="switchAdminTab('admin-tab-books', this)"><i class="fas fa-book w-5 mr-1 text-center"></i> Quản lí Sách</button>
                     <button class="menu-btn" onclick="switchAdminTab('admin-tab-users', this)"><i class="fas fa-users w-5 mr-1 text-center"></i> Quản lí User</button>
+                    <button class="menu-btn" onclick="switchAdminTab('admin-tab-feedback', this)"><i class="fas fa-comments w-5 mr-1 text-center"></i> Feedback</button>
                 </div>
             </div>
             
@@ -181,7 +181,7 @@
 
                     <div class="bg-white/70 p-6 rounded-2xl shadow-sm border border-indigo-100 mb-8">
                         <h3 class="text-lg font-bold text-slate-800 mb-2 flex items-center"><i class="fas fa-file-csv text-indigo-600 mr-2"></i> Nhập danh sách học sinh toàn trường (File CSV)</h3>
-                        <p class="text-xs text-slate-500 mb-4">Cấu trúc file CSV: Mã HS, Họ Tên, Lớp. Nhập xong sẽ tự tạo Thẻ Thư Viện cho học sinh.</p>
+                        <p class="text-xs text-slate-500 mb-4">Cấu trúc file CSV: Mã HS, Họ Tên, Lớp. Nhập xong hệ thống sẽ tự quét, bỏ qua các thẻ đã tồn tại và chỉ thêm thẻ mới.</p>
                         <div class="flex flex-col sm:flex-row items-center gap-4">
                             <input type="file" id="input-csv-file" accept=".csv" class="block w-full text-sm text-slate-500 border border-slate-200 rounded-xl bg-white file:py-2.5 file:px-4 file:bg-indigo-50 file:border-0 file:text-indigo-700">
                             <button id="btn-import-csv" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-medium transition-colors whitespace-nowrap">Bắt đầu Nhập</button>
@@ -192,7 +192,7 @@
                         <!-- BẢNG HỌC SINH -->
                         <div class="bg-white/70 rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
                             <div class="bg-slate-50 px-6 py-4 border-b flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                                <div class="font-semibold text-indigo-800 whitespace-nowrap"><i class="fas fa-list mr-2"></i>Danh sách Học Sinh</div>
+                                <div class="font-semibold text-indigo-800 whitespace-nowrap"><i class="fas fa-list mr-2"></i>Danh sách Học Sinh / GV</div>
                                 <div class="relative w-full sm:w-64">
                                     <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
                                     <input type="text" id="searchStudentInput" class="w-full pl-9 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-indigo-500" placeholder="Tìm tên, mã, SĐT, email...">
@@ -242,6 +242,37 @@
                 </div>
             </div>
 
+            <!-- TAB: SÁCH -->
+            <div id="admin-tab-books" class="admin-tab-content hidden h-full">
+                <div id="library-root"></div>
+            </div>
+
+            <!-- TAB: USER HỆ THỐNG -->
+            <div id="admin-tab-users" class="admin-tab-content hidden">
+                <div class="max-w-6xl mx-auto">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+                        <h2 class="text-2xl font-bold text-slate-800">Quản lý User Đăng nhập</h2>
+                        <div class="relative w-full sm:w-80">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <input type="text" id="searchUserInput" class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neonBlue focus:border-transparent text-sm shadow-sm transition-all" placeholder="Tìm tên hoặc email user...">
+                        </div>
+                    </div>
+
+                    <div class="bg-white/70 rounded-2xl border overflow-hidden shadow-sm">
+                        <div class="overflow-x-auto overflow-y-auto max-h-[calc(100vh-180px)]">
+                            <table class="w-full text-sm text-left whitespace-nowrap">
+                                <thead class="bg-slate-100 uppercase text-[10px] text-slate-500 sticky top-0 z-10">
+                                    <tr><th class="px-5 py-3">Tên hiển thị</th><th class="px-5 py-3">Email Google</th><th class="px-5 py-3">Hoạt động</th><th class="px-5 py-3">Trạng thái</th><th class="px-5 py-3">Hành động</th></tr>
+                                </thead>
+                                <tbody id="userTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- TAB: FEEDBACK -->
             <div id="admin-tab-feedback" class="admin-tab-content hidden">
                 <div class="max-w-6xl mx-auto">
@@ -271,37 +302,6 @@
                                     </tr>
                                 </thead>
                                 <tbody id="feedbackTable"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- TAB: SÁCH -->
-            <div id="admin-tab-books" class="admin-tab-content hidden h-full">
-                <div id="library-root"></div>
-            </div>
-
-            <!-- TAB: USER HỆ THỐNG -->
-            <div id="admin-tab-users" class="admin-tab-content hidden">
-                <div class="max-w-6xl mx-auto">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
-                        <h2 class="text-2xl font-bold text-slate-800">Quản lý User Đăng nhập</h2>
-                        <div class="relative w-full sm:w-80">
-                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
-                                <i class="fas fa-search"></i>
-                            </div>
-                            <input type="text" id="searchUserInput" class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neonBlue focus:border-transparent text-sm shadow-sm transition-all" placeholder="Tìm tên hoặc email user...">
-                        </div>
-                    </div>
-
-                    <div class="bg-white/70 rounded-2xl border overflow-hidden shadow-sm">
-                        <div class="overflow-x-auto overflow-y-auto max-h-[calc(100vh-180px)]">
-                            <table class="w-full text-sm text-left whitespace-nowrap">
-                                <thead class="bg-slate-100 uppercase text-[10px] text-slate-500 sticky top-0 z-10">
-                                    <tr><th class="px-5 py-3">Tên hiển thị</th><th class="px-5 py-3">Email Google</th><th class="px-5 py-3">Hoạt động</th><th class="px-5 py-3">Trạng thái</th><th class="px-5 py-3">Hành động</th></tr>
-                                </thead>
-                                <tbody id="userTable"></tbody>
                             </table>
                         </div>
                     </div>
@@ -344,6 +344,9 @@
         const cardDb = getFirestore(cardApp); 
 
         const ADMIN_UID = "idn9CUepaSOJOAL0Ag3ezSoQE4m1";
+        
+        // Link Google Script
+        const API_WRITE_URL = "https://script.google.com/macros/s/AKfycbzR2A37oCUMbdmW8gtbyojHXJ8TSMHR6FGQJ6dxM9fgM66pK0eVjA8WQvk4w7skLI9Cig/exec"; 
 
         let allFeedbacks = [];
 
@@ -352,18 +355,14 @@
                 loadAdminData();
                 loadFeedbackData();
 
-                // --- FIX LỖI ONLINE/OFFLINE KHI TẮT TAB ---
+                // --- ĐÁNH DẤU ONLINE ---
                 const userRef = doc(db, "users", user.uid);
-                
-                // Đánh dấu Online khi vào trang
                 updateDoc(userRef, { online: true }).catch(e => console.error(e));
 
-                // Lắng nghe sự kiện tắt tab / tắt trình duyệt
                 window.addEventListener('beforeunload', () => {
                     updateDoc(userRef, { online: false });
                 });
 
-                // Lắng nghe sự kiện ẩn ứng dụng (trên điện thoại)
                 document.addEventListener('visibilitychange', () => {
                     if (document.visibilityState === 'hidden') {
                         updateDoc(userRef, { online: false });
@@ -371,7 +370,6 @@
                         updateDoc(userRef, { online: true });
                     }
                 });
-                // ------------------------------------------
 
             } else {
                 window.location.href = "index.html"; 
@@ -391,56 +389,18 @@
             if(tabId === 'admin-tab-feedback') loadFeedbackData();
         };
 
-        // Hàm gọi API thực tế để gửi OTP
-        async function sendOTPRequest(email, phone, emailChanged, phoneChanged) {
-            let generatedSMS = null;
-            let generatedEmail = null;
-
-            if (phoneChanged) {
-                generatedSMS = Math.floor(100000 + Math.random() * 900000).toString();
-                const macroId = "a9b42a0f-ffd0-4578-9fd7-d5fd6be9d80d";
-                const macroUrl = `https://trigger.macrodroid.com/${macroId}/send_otp?phone=${encodeURIComponent(phone)}&otp=${generatedSMS}&t=${new Date().getTime()}`;
-                fetch(macroUrl, { method: 'GET', mode: 'no-cors', cache: 'no-store' }).catch(e => console.error(e));
-
-                const gasUrl = "https://script.google.com/macros/s/AKfycbxGTEalH-yos3juQ6jKdVWC6gus5cDqry8VoeoM3EIO2jX8NNjyBbo6_HdUthaf0s-hQg/exec";
-                fetch(`${gasUrl}?phone=${encodeURIComponent(phone)}&otp=${generatedSMS}&t=${new Date().getTime()}`, { method: 'GET', mode: 'no-cors', cache: 'no-store' }).catch(e => console.error(e));
-            }
-
-            if (emailChanged) {
-                generatedEmail = Math.floor(100000 + Math.random() * 900000).toString();
-                const timeString = new Date(new Date().getTime() + 15 * 60000).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-                
-                try {
-                    await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-                        method: 'POST', 
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ 
-                            service_id: 'service_arypin9', 
-                            template_id: 'template_g7k2h2r', 
-                            user_id: 'vC9HO0JtM7CI1HAu5', 
-                            template_params: { email: email, passcode: generatedEmail, time: timeString } 
-                        })
-                    });
-                } catch (err) {
-                    console.error("Lỗi gửi Email:", err);
-                }
-            }
-
-            return { smsOtp: generatedSMS, emailOtp: generatedEmail };
-        }
-
+        // ADMIN SỬA THÔNG TIN KHÔNG CẦN OTP - ĐỒNG BỘ TRỰC TIẾP LÊN SHEET
         window.editCard = async function(collectionName, currentId, currentName, currentPhone, currentEmail) {
             const isStudent = collectionName === 'students';
             
-            // BƯỚC 1: Hiển thị Form nhập thông tin
             const { value: formValues, isDismissed } = await Swal.fire({
                 title: isStudent ? 'Sửa thông tin Học sinh' : 'Sửa thông tin Khách',
                 html: `
                     <div class="text-left mt-4">
-                        <label class="block text-sm font-semibold text-slate-700 mb-1">Mã ${isStudent ? 'Học sinh' : 'Khách'}:</label>
-                        <input id="swal-input-id" class="w-full px-4 py-2 border rounded-xl mb-4 bg-slate-50 focus:outline-none focus:border-indigo-500" value="${currentId}" ${isStudent ? '' : 'disabled title="Mã khách không thể sửa"'}>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">Mã ${isStudent ? 'Học sinh/Giáo viên' : 'Khách'}:</label>
+                        <input id="swal-input-id" class="w-full px-4 py-2 border rounded-xl mb-4 bg-slate-200 text-slate-500 cursor-not-allowed focus:outline-none" value="${currentId}" disabled title="Mã không thể sửa">
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Họ Tên:</label>
-                        <input id="swal-input-name" class="w-full px-4 py-2 border rounded-xl mb-4 bg-slate-50 focus:outline-none focus:border-indigo-500" value="${currentName}">
+                        <input id="swal-input-name" class="w-full px-4 py-2 border rounded-xl mb-4 ${isStudent ? 'bg-slate-200 text-slate-500 cursor-not-allowed focus:outline-none' : 'bg-slate-50 focus:outline-none focus:border-indigo-500'}" value="${currentName}" ${isStudent ? 'disabled title="Tên học sinh không thể sửa"' : ''}>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Số điện thoại:</label>
                         <input id="swal-input-phone" type="tel" class="w-full px-4 py-2 border rounded-xl mb-4 bg-slate-50 focus:outline-none focus:border-indigo-500" value="${currentPhone}">
                         <label class="block text-sm font-semibold text-slate-700 mb-1">Email:</label>
@@ -450,7 +410,7 @@
                 focusConfirm: false,
                 showCancelButton: true,
                 confirmButtonColor: '#4f46e5',
-                confirmButtonText: 'Tiếp tục <i class="fas fa-arrow-right ml-1"></i>',
+                confirmButtonText: 'Lưu thay đổi <i class="fas fa-check ml-1"></i>',
                 cancelButtonText: 'Hủy',
                 preConfirm: () => {
                     return {
@@ -463,202 +423,8 @@
             });
 
             if (isDismissed || !formValues) return;
-
             if (!formValues.newName || !formValues.newId) return Swal.fire('Lỗi', 'Mã và Họ tên không được để trống!', 'error');
 
-            const emailChanged = formValues.newEmail !== currentEmail;
-            const phoneChanged = formValues.newPhone !== currentPhone;
-
-            // BƯỚC 2: Nếu thay đổi Email/SĐT -> Xác nhận OTP với custom layout
-            if (emailChanged || phoneChanged) {
-                let otpMessage = "";
-                let targetSend = "";
-                let inputsHtml = "";
-                
-                // Input tự động chặn chữ và khoảng trắng
-                const otpInputAttr = `type="text" inputmode="numeric" maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '')"`;
-                const otpInputClass = `w-3/4 mx-auto block px-4 py-3 border text-center text-2xl tracking-[0.5em] font-mono rounded-xl bg-slate-50 focus:outline-none focus:border-indigo-500 transition-all`;
-
-                if (emailChanged && phoneChanged) {
-                    otpMessage = `Hệ thống đã gửi mã OTP xác nhận đến Email <b>${formValues.newEmail}</b> và SĐT <b>${formValues.newPhone}</b>.`;
-                    targetSend = "cả Email và SĐT";
-                    inputsHtml = `
-                        <label class="block text-sm font-semibold text-slate-700 mb-1 mt-3">Mã OTP SMS:</label>
-                        <input id="swal-input-otp-sms" ${otpInputAttr} class="${otpInputClass}" placeholder="------">
-                        <label class="block text-sm font-semibold text-slate-700 mb-1 mt-3">Mã OTP Email:</label>
-                        <input id="swal-input-otp-email" ${otpInputAttr} class="${otpInputClass}" placeholder="------">
-                    `;
-                } else if (emailChanged) {
-                    otpMessage = `Hệ thống đã gửi mã OTP xác nhận đến Email <b>${formValues.newEmail}</b>.`;
-                    targetSend = "Email";
-                    inputsHtml = `
-                        <label class="block text-sm font-semibold text-slate-700 mb-1 mt-3">Mã OTP Email:</label>
-                        <input id="swal-input-otp-email" ${otpInputAttr} class="${otpInputClass}" placeholder="------">
-                    `;
-                } else if (phoneChanged) {
-                    otpMessage = `Hệ thống đã gửi mã OTP xác nhận đến SĐT <b>${formValues.newPhone}</b>.`;
-                    targetSend = "SĐT";
-                    inputsHtml = `
-                        <label class="block text-sm font-semibold text-slate-700 mb-1 mt-3">Mã OTP SMS:</label>
-                        <input id="swal-input-otp-sms" ${otpInputAttr} class="${otpInputClass}" placeholder="------">
-                    `;
-                }
-
-                Swal.fire({ title: `Đang gửi OTP đến ${targetSend}...`, allowOutsideClick: false, didOpen: () => { Swal.showLoading() }});
-                
-                let sentOtps = await sendOTPRequest(formValues.newEmail, formValues.newPhone, emailChanged, phoneChanged);
-
-                let currentSmsOtp = sentOtps.smsOtp;
-                let currentEmailOtp = sentOtps.emailOtp;
-                let otpTimestamp = Date.now();
-                let otpInterval;
-                let isOtpVerified = false;
-
-                // Popup OTP tùy chỉnh hoàn toàn (bỏ qua spinner mặc định của Swal)
-                await Swal.fire({
-                    title: 'Xác thực thay đổi',
-                    html: `
-                        <div class="text-sm text-slate-600 mb-4">${otpMessage}</div>
-                        ${inputsHtml}
-                        
-                        <div id="swal-custom-error" class="hidden text-red-500 font-medium text-sm mt-4 bg-red-50 p-3 rounded-xl border border-red-200 text-left transition-all"></div>
-                        
-                        <div class="flex justify-between items-center mt-6 px-2 mb-2">
-                            <span id="swal-otp-timer" class="text-sm font-semibold text-slate-600"><i class="far fa-clock mr-1"></i> Hiệu lực: 05:00</span>
-                            <button type="button" id="swal-btn-resend" class="text-blue-600 font-bold text-sm hover:underline disabled:text-slate-400 disabled:no-underline transition-colors" disabled>Gửi lại mã (60s)</button>
-                        </div>
-
-                        <!-- 2 nút tùy chỉnh -->
-                        <div class="flex gap-3 mt-4">
-                            <button type="button" id="swal-custom-cancel" class="w-1/3 bg-slate-400 hover:bg-slate-500 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors text-base">
-                                Hủy
-                            </button>
-                            <button type="button" id="swal-custom-confirm" class="w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 px-4 rounded-xl shadow-lg transition-colors flex justify-center items-center text-base">
-                                <i class="fas fa-check-circle mr-2"></i> Xác nhận mã
-                            </button>
-                        </div>
-                    `,
-                    showConfirmButton: false, // Tắt hoàn toàn nút mặc định để tránh lỗi treo UI
-                    showCancelButton: false,
-                    allowOutsideClick: false,
-                    didOpen: () => {
-                        const timerEl = document.getElementById('swal-otp-timer');
-                        const resendBtn = document.getElementById('swal-btn-resend');
-                        const errorEl = document.getElementById('swal-custom-error');
-                        const btnConfirm = document.getElementById('swal-custom-confirm');
-                        const btnCancel = document.getElementById('swal-custom-cancel');
-
-                        const showError = (msg) => {
-                            errorEl.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i> ${msg}`;
-                            errorEl.classList.remove('hidden');
-                        };
-                        const hideError = () => {
-                            errorEl.classList.add('hidden');
-                        };
-
-                        // Logic đếm ngược và mở khóa nút gửi lại
-                        const updateTimer = () => {
-                            let elapsed = Math.floor((Date.now() - otpTimestamp) / 1000);
-                            let remaining = 300 - elapsed; // 5 phút
-
-                            if (remaining <= 0) {
-                                timerEl.innerHTML = `<i class="fas fa-times-circle mr-1"></i> Mã OTP đã hết hạn!`;
-                                timerEl.classList.replace("text-slate-600", "text-red-500");
-                                btnConfirm.disabled = true;
-                                btnConfirm.classList.add("opacity-50", "cursor-not-allowed");
-                                resendBtn.disabled = false;
-                                resendBtn.innerText = "Gửi lại mã mới";
-                            } else {
-                                let m = Math.floor(remaining / 60).toString().padStart(2, '0');
-                                let s = (remaining % 60).toString().padStart(2, '0');
-                                timerEl.innerHTML = `<i class="far fa-clock mr-1"></i> Hiệu lực: ${m}:${s}`;
-                                btnConfirm.disabled = false;
-                                btnConfirm.classList.remove("opacity-50", "cursor-not-allowed");
-                            }
-
-                            let resendRemaining = 60 - elapsed;
-                            if (resendRemaining <= 0 && remaining > 0) {
-                                resendBtn.disabled = false;
-                                resendBtn.innerText = "Gửi lại mã";
-                            } else if (remaining > 0) {
-                                resendBtn.disabled = true;
-                                resendBtn.innerText = `Gửi lại mã (${resendRemaining}s)`;
-                            }
-                        };
-
-                        updateTimer();
-                        otpInterval = setInterval(updateTimer, 1000);
-
-                        // Click Gửi lại mã
-                        resendBtn.addEventListener('click', async () => {
-                            resendBtn.disabled = true;
-                            resendBtn.innerText = "Đang gửi...";
-                            
-                            const newOtps = await sendOTPRequest(formValues.newEmail, formValues.newPhone, emailChanged, phoneChanged);
-                            if(phoneChanged) currentSmsOtp = newOtps.smsOtp;
-                            if(emailChanged) currentEmailOtp = newOtps.emailOtp;
-
-                            otpTimestamp = Date.now();
-                            timerEl.classList.replace("text-red-500", "text-slate-600");
-                            hideError();
-                            
-                            if(phoneChanged) document.getElementById('swal-input-otp-sms').value = '';
-                            if(emailChanged) document.getElementById('swal-input-otp-email').value = '';
-
-                            updateTimer();
-                        });
-
-                        // Click Hủy
-                        btnCancel.addEventListener('click', () => {
-                            Swal.close();
-                        });
-
-                        // Click Xác nhận tùy chỉnh (Bắt lỗi và chặn trực tiếp tại đây)
-                        btnConfirm.addEventListener('click', () => {
-                            hideError();
-
-                            if (Date.now() - otpTimestamp > 300 * 1000) {
-                                showError('Mã OTP đã hết hạn. Vui lòng bấm Gửi lại mã!');
-                                return;
-                            }
-
-                            if (phoneChanged) {
-                                const smsOtp = document.getElementById('swal-input-otp-sms').value;
-                                if (smsOtp.length !== 6) {
-                                    showError('Vui lòng nhập đủ 6 chữ số cho OTP SMS!');
-                                    return;
-                                }
-                                if (smsOtp !== currentSmsOtp) {
-                                    showError('Mã OTP SMS không chính xác!');
-                                    return;
-                                }
-                            }
-                            if (emailChanged) {
-                                const emailOtp = document.getElementById('swal-input-otp-email').value;
-                                if (emailOtp.length !== 6) {
-                                    showError('Vui lòng nhập đủ 6 chữ số cho OTP Email!');
-                                    return;
-                                }
-                                if (emailOtp !== currentEmailOtp) {
-                                    showError('Mã OTP Email không chính xác!');
-                                    return;
-                                }
-                            }
-
-                            // OTP Đúng -> Ghi nhận và tắt bảng
-                            isOtpVerified = true;
-                            Swal.close();
-                        });
-                    },
-                    willClose: () => {
-                        clearInterval(otpInterval);
-                    }
-                });
-
-                if (!isOtpVerified) return; // Dừng lại nếu người dùng không xác minh xong
-            }
-
-            // BƯỚC 3: Lưu vào Firestore
             try {
                 Swal.fire({title: 'Đang lưu dữ liệu...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() }});
                 
@@ -673,7 +439,21 @@
                 } else {
                     await updateDoc(docRef, { name: formValues.newName, phone: formValues.newPhone, email: formValues.newEmail });
                 }
-                Swal.fire({title: 'Thành công!', text: 'Đã cập nhật thông tin.', icon: 'success', timer: 1500, showConfirmButton: false});
+                
+                if (formValues.newEmail !== currentEmail || formValues.newPhone !== currentPhone) {
+                    await fetch(API_WRITE_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({
+                            action: "update_user_info",
+                            oldEmail: currentEmail,
+                            newEmail: formValues.newEmail,
+                            newPhone: formValues.newPhone
+                        })
+                    });
+                }
+
+                Swal.fire({title: 'Thành công!', text: 'Đã cập nhật thông tin và đồng bộ với danh sách mượn.', icon: 'success', timer: 2000, showConfirmButton: false});
             } catch (error) { 
                 Swal.fire('Lỗi!', error.message, 'error'); 
             }
@@ -681,21 +461,32 @@
 
         window.deleteCard = async function(collectionName, id) {
             const result = await Swal.fire({
-                title: 'Xóa thẻ này?',
-                text: "Bạn không thể khôi phục lại dữ liệu sau khi xóa!",
+                title: 'Xóa thẻ & Dữ liệu mượn?',
+                html: "Hành động này sẽ xóa thẻ điện tử và <b>xóa sạch toàn bộ rác (đơn chờ duyệt, lịch sử sách)</b> liên quan đến mã thẻ này trên hệ thống Google Sheet!",
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
                 cancelButtonColor: '#64748b',
-                confirmButtonText: '<i class="fas fa-trash mr-1"></i> Xóa vĩnh viễn',
+                confirmButtonText: '<i class="fas fa-trash mr-1"></i> Xóa sạch hệ thống',
                 cancelButtonText: 'Hủy'
             });
 
             if (result.isConfirmed) {
                 try {
+                    Swal.fire({title: 'Đang dọn dẹp hệ thống...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() }});
+                    
                     await deleteDoc(doc(cardDb, collectionName, id));
-                    Swal.fire({title: 'Đã xóa!', text: 'Dữ liệu thẻ đã bị xóa.', icon: 'success', timer: 1500, showConfirmButton: false});
-                } catch (error) { Swal.fire('Lỗi!', error.message, 'error'); }
+                    
+                    await fetch(API_WRITE_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ action: "delete_user_records", cardId: id })
+                    });
+
+                    Swal.fire({title: 'Đã xóa sạch!', text: 'Dữ liệu thẻ và mọi lịch sử liên quan đã bị gỡ khỏi hệ thống.', icon: 'success', timer: 2500, showConfirmButton: false});
+                } catch (error) { 
+                    Swal.fire('Lỗi!', "Có lỗi trong quá trình xóa: " + error.message, 'error'); 
+                }
             }
         };
 
@@ -897,6 +688,7 @@
             } catch(error) { Swal.fire("Lỗi", error.message, "error"); }
         };
 
+        // --- CẢI TIẾN: CHECK TRÙNG LẶP MÃ HỌC SINH TỪ TỆP CSV TRƯỚC KHI THÊM ---
         document.getElementById('btn-import-csv').addEventListener('click', () => {
             const fileInput = document.getElementById('input-csv-file');
             const file = fileInput.files[0];
@@ -908,7 +700,8 @@
                     const text = e.target.result;
                     const rows = text.split('\n');
                     let count = 0;
-                    Swal.fire({title: 'Đang xử lý...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() }});
+                    let dupCount = 0;
+                    Swal.fire({title: 'Đang xử lý...', text: 'Hệ thống đang quét chống trùng lặp, vui lòng đợi...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() }});
 
                     for (let i = 1; i < rows.length; i++) { 
                         const cols = rows[i].split(',');
@@ -916,10 +709,25 @@
                             const studentId = cols[0].trim();
                             const name = cols[1].trim();
                             const className = cols[2].trim();
-                            if (studentId && name) { await setDoc(doc(cardDb, 'students', studentId), { studentId, name, class: className }); count++; }
+                            
+                            if (studentId && name) { 
+                                // KIỂM TRA MÃ HỌC SINH ĐÃ TỒN TẠI HAY CHƯA
+                                const docSnap = await getDoc(doc(cardDb, 'students', studentId));
+                                if (docSnap.exists()) {
+                                    dupCount++; 
+                                } else {
+                                    await setDoc(doc(cardDb, 'students', studentId), { studentId, name, class: className }); 
+                                    count++; 
+                                }
+                            }
                         }
                     }
-                    Swal.fire("Thành công", `Đã nhập thành công ${count} dữ liệu học sinh!`, "success");
+                    Swal.fire({
+                        title: "Hoàn tất Nhập CSV",
+                        html: `Đã tạo thẻ mới thành công: <b>${count}</b> người.<br>Đã bỏ qua: <b class="text-orange-500">${dupCount}</b> thẻ (Do bị trùng mã với dữ liệu đã có).`,
+                        icon: "success",
+                        confirmButtonColor: '#3b82f6'
+                    });
                     fileInput.value = ''; 
                 } catch(err) { Swal.fire("Lỗi", "Không thể nhập dữ liệu. Vui lòng kiểm tra lại cấu trúc file CSV.", "error"); }
             };
@@ -939,7 +747,7 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // URL GIAO TIẾP VỚI GOOGLE SHEET (WEB APP) - Link mới nhất của bạn
+        // URL GIAO TIẾP VỚI GOOGLE SHEET
         const API_WRITE_URL = "https://script.google.com/macros/s/AKfycbyrQ3qLlnAN-dSRZ3dA3UnCy5ScRAIKCvmHCKphHOUjsvKLi-gZDHjEVECmPdVcJrGKYQ/exec"; 
 
         const Icon = ({ path, className }) => (
@@ -965,10 +773,7 @@
             }, []);
 
             const handleSync = async (isAuto = false) => {
-                if (!API_WRITE_URL) {
-                    Swal.fire("Lỗi", "Chưa có Link Web App", "error");
-                    return;
-                }
+                if (!API_WRITE_URL) return;
                 setLoading(true);
                 try {
                     const response = await fetch(API_WRITE_URL, {
@@ -993,7 +798,7 @@
                             return { ...loan, books: parsedBooks };
                         });
 
-                        setLoans(processedData.reverse()); // Đảo ngược để đơn mới nhất lên trên
+                        setLoans(processedData.reverse()); 
                         if (!isAuto) {
                             Swal.fire({ toast: true, position: 'bottom-end', showConfirmButton: false, timer: 2000, icon: 'success', title: 'Dữ liệu đã được làm mới' });
                         }
@@ -1002,7 +807,7 @@
                     }
                 } catch (error) {
                     console.error("Lỗi Sync Data:", error);
-                    if (!isAuto) Swal.fire("Lỗi kết nối / CORS", "Không thể lấy dữ liệu. Vui lòng kiểm tra lại quyền truy cập (Anyone) của Google Script hoặc tắt phần mềm chặn quảng cáo.", "error");
+                    if (!isAuto) Swal.fire("Lỗi kết nối", "Không thể lấy dữ liệu", "error");
                 } finally {
                     setLoading(false);
                 }
@@ -1038,19 +843,18 @@
                     try {
                         resData = JSON.parse(rawText);
                     } catch(parseErr) {
-                        console.error("Dữ liệu lỗi từ GAS:", rawText);
-                        throw new Error("Lỗi máy chủ Google hoặc sai quyền truy cập.");
+                        throw new Error("Lỗi máy chủ Google");
                     }
                     
                     if(resData.status !== "success") throw new Error(resData.message || "Lỗi không xác định");
 
-                    // ĐÃ FIX: Thêm lệnh tự lật màn hình "Gia hạn" thành "Đang mượn" ngay lập tức
                     setLoans(loans.map(loan => {
                         if (loan.id === id) {
                             if (actionType === 'admin_approve') return { ...loan, status: "Đang mượn" };
                             if (actionType === 'admin_return') return { ...loan, status: "Đã trả" };
                             if (actionType === 'admin_undo') return { ...loan, status: "Đang mượn" };
                             if (actionType === 'admin_extend') return { ...loan, status: "Đang mượn" }; 
+                            if (actionType === 'admin_reject') return { ...loan, status: "Từ chối", note: `Lý do: ${extraData.reason}` }; 
                         }
                         return loan;
                     }));
@@ -1060,12 +864,10 @@
                         title: 'Thao tác thành công!'
                     });
 
-                    // Lấy dữ liệu mới nhất từ Server để đồng bộ chuẩn xác nhất
                     handleSync(true);
 
                 } catch (error) {
-                    console.error("Lỗi Update Status:", error);
-                    Swal.fire("Lỗi kết nối / CORS", "Trình duyệt chặn request. Vui lòng đảm bảo bạn đã cấp quyền 'Anyone' (Bất kỳ ai) cho Web App trên Google Script.", "error");
+                    Swal.fire("Lỗi", "Chặn request", "error");
                 } finally {
                     setProcessingId(null);
                 }
@@ -1099,6 +901,29 @@
                 }
             };
 
+            const handleReject = async (id) => {
+                const { value: reason } = await Swal.fire({
+                    title: 'Từ chối đơn mượn',
+                    input: 'textarea',
+                    inputLabel: 'Nhập lý do từ chối để gửi cho người mượn:',
+                    inputPlaceholder: 'Ví dụ: Sách đã có người mượn, Sách đang bảo trì...',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#94a3b8',
+                    confirmButtonText: '<i class="fas fa-paper-plane mr-1"></i> Gửi và Từ chối',
+                    cancelButtonText: 'Hủy',
+                    inputValidator: (value) => {
+                        if (!value || value.trim() === '') {
+                            return 'Vui lòng nhập lý do từ chối để thông báo!'
+                        }
+                    }
+                });
+
+                if (reason) {
+                    handleUpdateStatus(id, 'admin_reject', { reason: reason.trim() });
+                }
+            };
+
             const filteredLoans = loans.filter(loan => {
                 const s = searchTerm.toLowerCase().trim();
                 const matchSearch = (loan.name && loan.name.toLowerCase().includes(s)) ||
@@ -1119,6 +944,7 @@
                 const s = statusRaw.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d");
                 if (s.includes("da tra") || statusRaw.includes("✅")) return "bg-green-100 text-green-700 border-green-200";
                 if (s.includes("qua han")) return "bg-red-100 text-red-700 border-red-200";
+                if (s.includes("tu choi")) return "bg-gray-100 text-gray-600 border-gray-300";
                 if (s.includes("cho duyet")) return "bg-orange-100 text-orange-700 border-orange-200";
                 return "bg-yellow-100 text-yellow-800 border-yellow-200";
             };
@@ -1208,7 +1034,7 @@
                                 <thead className="bg-gray-50 text-gray-500 font-mono text-xs sticky top-0 z-20 shadow-sm">
                                     <tr>
                                         <th className="p-4 font-bold bg-gray-50">THỜI GIAN / MÃ</th>
-                                        <th className="p-4 font-bold bg-gray-50">HỌC SINH</th>
+                                        <th className="p-4 font-bold bg-gray-50">NGƯỜI MƯỢN</th>
                                         <th className="p-4 font-bold bg-gray-50">SÁCH MƯỢN</th>
                                         <th className="p-4 font-bold bg-gray-50">HẠN TRẢ</th>
                                         <th className="p-4 font-bold bg-gray-50">TRẠNG THÁI</th>
@@ -1224,9 +1050,38 @@
                                             </td>
                                             <td className="p-4 align-top">
                                                 <div className="font-bold text-slate-700">{loan.name}</div>
-                                                <div className="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-2 font-mono">
-                                                    <span className="bg-slate-100 px-2 py-0.5 rounded">{loan.class}</span>
-                                                    {loan.studentId && <span>{loan.studentId}</span>}
+                                                <div className="text-xs mt-1 flex flex-wrap items-center gap-2 font-mono">
+                                                    {(() => {
+                                                        let displayRole = loan.role || 'Học sinh';
+                                                        const classStr = (loan.class || '').toLowerCase();
+                                                        const idStr = (loan.studentId || '').toUpperCase();
+                                                        
+                                                        if (displayRole === 'Học sinh') {
+                                                            if (classStr.includes('giáo viên') || classStr.includes('gv') || idStr.includes('GV')) {
+                                                                displayRole = 'Giáo viên';
+                                                            } else if (classStr.includes('khách') || idStr.includes('GUEST')) {
+                                                                displayRole = 'Khách ngoài trường';
+                                                            }
+                                                        }
+
+                                                        let badgeColor = 'bg-blue-100 text-blue-700'; 
+                                                        if (displayRole.toLowerCase().includes('giáo')) badgeColor = 'bg-purple-100 text-purple-700'; 
+                                                        if (displayRole.toLowerCase().includes('ngoài')) badgeColor = 'bg-emerald-100 text-emerald-700'; 
+
+                                                        const isTeacher = displayRole === 'Giáo viên';
+
+                                                        return (
+                                                            <>
+                                                                <span className={`px-2 py-0.5 rounded font-bold ${badgeColor}`}>
+                                                                    {displayRole}
+                                                                </span>
+                                                                {/* NẾU LÀ GIÁO VIÊN -> KHÔNG HIỆN LỚP NỮA */}
+                                                                {!isTeacher && loan.class && <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-500">{loan.class}</span>}
+                                                                {/* ĐẨY MÃ LÊN NGANG HÀNG */}
+                                                                {loan.studentId && <span className="text-slate-600 font-bold bg-slate-100 px-2 py-0.5 rounded border border-slate-200">{loan.studentId}</span>}
+                                                            </>
+                                                        );
+                                                    })()}
                                                 </div>
                                                 {loan.email && (
                                                     <div className="text-xs text-slate-400 mt-1 font-mono flex items-center gap-1">
@@ -1262,16 +1117,26 @@
                                             <td className="p-4 align-top text-right sticky right-0 bg-white group-hover:bg-slate-50 z-10 shadow-[-6px_0_10px_-3px_rgba(0,0,0,0.05)] border-l border-gray-100 transition-colors">
                                                 <div className="flex flex-col justify-end gap-2 items-end">
                                                     
-                                                    {/* NẾU CHỜ DUYỆT -> HIỆN NÚT PHÊ DUYỆT */}
-                                                    {loan.status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").includes("cho") && (
-                                                        <button 
-                                                            onClick={() => handleUpdateStatus(loan.id, 'admin_approve')}
-                                                            disabled={processingId === loan.id}
-                                                            className={`flex items-center justify-center gap-1.5 bg-orange-500 text-white hover:bg-orange-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm w-28 ${processingId === loan.id ? "opacity-50 cursor-wait" : ""}`}
-                                                        >
-                                                            {processingId === loan.id ? <Icons.Loader2 className="h-4 w-4 animate-spin"/> : <Icons.CheckCircle className="h-4 w-4"/>} 
-                                                            PHÊ DUYỆT
-                                                        </button>
+                                                    {/* NẾU CHỜ DUYỆT -> HIỆN NÚT PHÊ DUYỆT VÀ NÚT TỪ CHỐI */}
+                                                    {loan.status.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").includes("cho duyet") && (
+                                                        <div className="flex flex-col gap-1.5 w-28">
+                                                            <button 
+                                                                onClick={() => handleUpdateStatus(loan.id, 'admin_approve')}
+                                                                disabled={processingId === loan.id}
+                                                                className={`flex items-center justify-center gap-1.5 bg-orange-500 text-white hover:bg-orange-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm w-full ${processingId === loan.id ? "opacity-50 cursor-wait" : ""}`}
+                                                            >
+                                                                {processingId === loan.id ? <Icons.Loader2 className="h-4 w-4 animate-spin"/> : <Icons.CheckCircle className="h-4 w-4"/>} 
+                                                                PHÊ DUYỆT
+                                                            </button>
+                                                            <button 
+                                                                onClick={() => handleReject(loan.id)}
+                                                                disabled={processingId === loan.id}
+                                                                className={`flex items-center justify-center gap-1.5 bg-red-500 text-white hover:bg-red-600 px-3 py-1.5 rounded-lg text-xs font-bold transition-all shadow-sm w-full ${processingId === loan.id ? "opacity-50 cursor-wait" : ""}`}
+                                                            >
+                                                                {processingId === loan.id ? <Icons.Loader2 className="h-4 w-4 animate-spin"/> : <Icons.XCircle className="h-4 w-4"/>} 
+                                                                TỪ CHỐI
+                                                            </button>
+                                                        </div>
                                                     )}
 
                                                     {/* NẾU ĐANG MƯỢN / QUÁ HẠN -> HIỆN NÚT TRẢ SÁCH VÀ GIA HẠN */}
