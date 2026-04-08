@@ -208,7 +208,6 @@
         <!-- 3. HOME SCREEN -->
         <div id="view-home" class="view-section">
             <div class="bg-white p-8 rounded-3xl shadow-xl border border-slate-100/50 card-hover">
-                <!-- ĐÃ CẬP NHẬT: Thêm nút quay lại Dashboard ở trang chủ thẻ -->
                 <button type="button" onclick="window.location.href='studentpage.html'" class="flex items-center text-slate-500 hover:text-blue-600 mb-4 text-sm font-semibold transition-colors group">
                     <i class="fas fa-arrow-left mr-2 group-hover:-translate-x-1 transition-transform"></i> Về Dashboard
                 </button>
@@ -736,7 +735,17 @@
             btnSubmit.disabled = true;
 
             try {
-                // Kiểm tra Email tồn tại trong bảng học sinh
+                // --- FIX LỖI: KIỂM TRA MÃ HS ĐÃ TỒN TẠI (TRÙNG LẶP MÃ THẺ) ---
+                const checkDoc = await getDoc(doc(db, "students", tempRegistrationData.studentId));
+                if (checkDoc.exists()) {
+                    Swal.fire({ title: "Lỗi trùng lặp", text: "Mã học sinh này đã được ai đó đăng ký thẻ thư viện rồi! Vui lòng tải lại trang và tra cứu lại mã.", icon: "error", confirmButtonColor: '#3b82f6' });
+                    btnText.style.display = 'flex';
+                    btnLoad.classList.add('hidden');
+                    btnSubmit.disabled = false;
+                    return;
+                }
+
+                // Kiểm tra Email tồn tại
                 const emailQuery = query(collection(db, 'students'), where('email', '==', email));
                 const emailSnap = await getDocs(emailQuery);
                 if (!emailSnap.empty) {
@@ -744,7 +753,7 @@
                     return;
                 }
 
-                // Kiểm tra SĐT tồn tại trong bảng học sinh
+                // Kiểm tra SĐT tồn tại
                 const phoneQuery = query(collection(db, 'students'), where('phone', '==', phone));
                 const phoneSnap = await getDocs(phoneQuery);
                 if (!phoneSnap.empty) {
@@ -820,7 +829,7 @@
                 const phoneQuery = query(collection(db, 'guests'), where('phone', '==', tempRegistrationData.phone));
                 const phoneSnap = await getDocs(phoneQuery);
                 if (!phoneSnap.empty) {
-                    Swal.fire({ title: "SĐT đã tồn tại", text: "Số điện thoại này đã được gắn với một thẻ khác.", icon: "warning", confirmButtonColor: '#3b82f6' });
+                    Swal.fire({ title: "SĐT đã tồn tại", text: "Số điện thoại này đã được gắn với một thẻ khách khác.", icon: "warning", confirmButtonColor: '#3b82f6' });
                     return;
                 }
 
@@ -858,7 +867,7 @@
         });
 
         // ==========================================
-        // BƯỚC 2 & 3: XỬ LÝ NHẬP MÃ OTP VÀ XÁC NHẬN CHO CẢ 2 LOẠI
+        // BƯỚC 2 & 3: XỬ LÝ NHẬP MÃ OTP VÀ XÁC NHẬN
         // ==========================================
         document.getElementById('form-verify-otp').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -933,10 +942,17 @@
                 btnOtpSubmit.disabled = true;
 
                 try {
-                    clearInterval(countdownInterval); // Dừng đếm ngược
+                    clearInterval(countdownInterval); 
                     
                     // --- NẾU LÀ HỌC SINH ---
                     if (registrationType === 'student') {
+                        // FIX: Kiểm tra lần cuối cùng xem có ai đăng ký mã này vào giây phút cuối không
+                        const checkLastTime = await getDoc(doc(db, "students", tempRegistrationData.studentId));
+                        if(checkLastTime.exists()) {
+                            Swal.fire("Rất tiếc", "Mã này vừa được ai đó đăng ký cách đây vài giây!", "error");
+                            return;
+                        }
+
                         const fullData = {
                             name: tempRegistrationData.name, 
                             class: tempRegistrationData.class, 
@@ -952,7 +968,14 @@
                     } 
                     // --- NẾU LÀ KHÁCH NGOÀI ---
                     else if (registrationType === 'guest') {
-                        const guestId = `GUEST${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+                        // FIX: Khách ngoài tạo mã random, phòng khi mã đó trùng với khách khác
+                        let guestId = `GUEST${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+                        let checkGuest = await getDoc(doc(db, 'guests', guestId));
+                        while (checkGuest.exists()) {
+                            guestId = `GUEST${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+                            checkGuest = await getDoc(doc(db, 'guests', guestId));
+                        }
+
                         const fullData = {
                             name: tempRegistrationData.name, 
                             phone: tempRegistrationData.phone, 
@@ -983,7 +1006,7 @@
         });
         document.getElementById('btn-to-guest').addEventListener('click', () => showView('view-guest-form'));
         
-        // NÚT ĐỔI THÔNG TIN (QUAY LẠI TỪ MÀN HÌNH OTP DÀNH CHO CẢ 2 LOẠI)
+        // NÚT ĐỔI THÔNG TIN
         document.getElementById('btn-back-from-otp').addEventListener('click', () => {
             currentOtpStep = ''; 
             clearInterval(countdownInterval);
@@ -994,12 +1017,12 @@
             }
         });
 
-        // Nút "Quay về trang chủ" Ở MÀN HÌNH DIGITAL CARD -> Chuyển hướng tới trang studentpage.html
+        // Nút "Quay về trang chủ" Ở MÀN HÌNH DIGITAL CARD
         document.getElementById('btn-finish-redirect').addEventListener('click', () => {
             window.location.href = 'studentpage.html';
         });
 
-        // Các nút Quay lại khác (Về trang check mã mặc định)
+        // Các nút Quay lại khác
         document.querySelectorAll('.btn-back').forEach(b => b.addEventListener('click', () => {
             currentOtpStep = ''; 
             clearInterval(countdownInterval);
@@ -1008,7 +1031,6 @@
         }));
 
         initApp();
-
     </script>
 </body>
 </html>
