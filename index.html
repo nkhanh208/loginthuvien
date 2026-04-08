@@ -8,7 +8,7 @@
     <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Sign in & Sign up Form</title>
+    <title>Đăng nhập Thư Viện</title>
   </head>
 
   <body>
@@ -18,16 +18,16 @@
 
           <!-- ADMIN -->
           <form action="#" class="sign-in-form">
-            <h2 class="title">Log in as Admin</h2>
+            <h2 class="title">Admin Login</h2>
 
             <button type="button" id="adminGoogleLogin" class="btn">
               <i class="fab fa-google"></i> Login with Google
             </button>
           </form>
 
-          <!-- STUDENT -->
+          <!-- STUDENT / TEACHER -->
           <form action="#" class="sign-up-form">
-            <h2 class="title">Log in as Student</h2>
+            <h2 class="title">Student & Teacher</h2>
 
             <button type="button" id="googleLogin" class="btn">
               <i class="fab fa-google"></i> Login with Google
@@ -42,10 +42,10 @@
       <div class="panels-container">
         <div class="panel left-panel">
           <div class="content">
-            <h3>New here ?</h3>
-            <p>Student login using Google account.</p>
+            <h3>Xin chào!</h3>
+            <p>Học sinh và Giáo viên đăng nhập hệ thống Thư viện tại đây bằng tài khoản Google.</p>
             <button class="btn transparent" id="sign-up-btn">
-              Student
+              Student / Teacher
             </button>
           </div>
           <img src="log.svg" class="image" alt="" />
@@ -53,10 +53,10 @@
 
         <div class="panel right-panel">
           <div class="content">
-            <h3>One of us ?</h3>
-            <p>Admin access only.</p>
+            <h3>Admin Panel</h3>
+            <p>Khu vực đăng nhập dành riêng cho Quản trị viên (Thủ thư).</p>
             <button class="btn transparent" id="sign-in-btn">
-              Admin
+              Admin Login
             </button>
           </div>
           <img src="register.svg" class="image" alt="" />
@@ -129,8 +129,7 @@ document.getElementById("adminGoogleLogin")
     if (user.uid === ADMIN_UID) {
 
       Swal.fire({
-        title: "Login Success!",
-        text: "Welcome Admin",
+        title: "Đăng nhập thành công!",
         icon: "success",
         showConfirmButton: false,
         timer: 1500
@@ -143,8 +142,8 @@ document.getElementById("adminGoogleLogin")
       await signOut(auth);
 
       Swal.fire({
-        title: "Access Denied",
-        text: "You are not Admin!",
+        title: "Từ chối truy cập",
+        text: "Bạn không có quyền Admin!",
         icon: "error",
         confirmButtonText: "OK"
       });
@@ -156,7 +155,7 @@ document.getElementById("adminGoogleLogin")
     console.error("Admin login error:", error);
 
     Swal.fire({
-      title: "Login Failed",
+      title: "Lỗi đăng nhập",
       text: error.message,
       icon: "error"
     });
@@ -165,7 +164,7 @@ document.getElementById("adminGoogleLogin")
 });
 
 
-// ================= STUDENT GOOGLE LOGIN =================
+// ================= STUDENT / TEACHER GOOGLE LOGIN =================
 document.getElementById("googleLogin")
 .addEventListener("click", async () => {
 
@@ -181,7 +180,6 @@ document.getElementById("googleLogin")
 
     // 🔥 Nếu user chưa tồn tại (login lần đầu)
     if (!snap.exists()) {
-
       await setDoc(userRef, {
         name: user.displayName,
         email: user.email,
@@ -191,22 +189,17 @@ document.getElementById("googleLogin")
         createdAt: serverTimestamp(),
         lastSeen: serverTimestamp()
       });
-
     } else {
-
       const data = snap.data();
 
       // 🚨 Nếu bị block → không cho login
       if (data.status === "blocked") {
-
         await signOut(auth);
-
         Swal.fire({
-          title: "Account Blocked",
-          text: "Your account has been blocked by Admin.",
+          title: "Tài khoản bị khóa",
+          text: "Tài khoản của bạn đã bị Admin chặn truy cập.",
           icon: "error"
         });
-
         return;
       }
 
@@ -215,25 +208,48 @@ document.getElementById("googleLogin")
         online: true,
         lastSeen: serverTimestamp()
       }, { merge: true });
-
     }
 
+    // ==========================================
+    // LOGIC PHÂN QUYỀN ĐIỀU HƯỚNG BẰNG EMAIL
+    // ==========================================
+    const email = user.email ? user.email.toLowerCase().trim() : "";
+    
+    // DANH SÁCH EMAIL GIÁO VIÊN
+    const teacherEmails = [
+        "lop12a3@nhc.edu.vn", 
+        "bckapp001@gmail.com", 
+        "hieutruong@nhc.edu.vn",
+        "thuthu@nhc.edu.vn"
+    ];
+    
+    const isTeacher = teacherEmails.includes(email) || email.endsWith("@gv.nhc.edu.vn");
+    
+    // MẶC ĐỊNH LÀ VÀO TRANG HỌC SINH
+    let targetPage = "studentpage.html"; 
+    
+    // CHỈ CHUYỂN TRANG NẾU ĐÚNG LÀ GIÁO VIÊN VÀ KHÔNG PHẢI ADMIN
+    if (isTeacher && user.uid !== ADMIN_UID) {
+        targetPage = "teacherpage.html"; 
+    }
+    // Nếu là Admin thì targetPage vẫn giữ nguyên là "studentpage.html", không bị ép nhảy đi đâu nữa!
+
+    // Hiển thị Popup Đăng nhập
     Swal.fire({
-      title: "Welcome!",
-      text: user.displayName,
+      title: "Đăng nhập thành công!",
       icon: "success",
       showConfirmButton: false,
       timer: 1500
     }).then(() => {
-      window.location.href = "studentpage.html";
+      window.location.href = targetPage;
     });
 
   } catch (error) {
 
-    console.error("Student login error:", error);
+    console.error("Student/Teacher login error:", error);
 
     Swal.fire({
-      title: "Login Failed",
+      title: "Lỗi đăng nhập",
       text: error.message,
       icon: "error"
     });
