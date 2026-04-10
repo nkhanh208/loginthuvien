@@ -342,12 +342,30 @@ body{
   gap: 15px;
 }
 
+/* Biểu tượng sách mặc định (nếu không có ảnh) */
 .book-icon {
   font-size: 35px;
   background: rgba(255,255,255,0.5);
-  padding: 10px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 80px;
+  flex-shrink: 0;
+}
+
+/* Ảnh bìa sách mới thêm vào */
+.book-cover {
+  width: 60px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.5);
+  background-color: white; /* Phòng trường hợp ảnh trong suốt */
 }
 
 .book-title-group h4 { margin: 0; font-size: 15px; color: #222; margin-bottom: 4px;}
@@ -748,7 +766,7 @@ const cardFirebaseConfig = {
 const cardApp = initializeApp(cardFirebaseConfig, "cardApp");
 const cardDb = getFirestore(cardApp);
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzR2A37oCUMbdmW8gtbyojHXJ8TSMHR6FGQJ6dxM9fgM66pK0eVjA8WQvk4w7skLI9Cig/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbweY2qWa5jH_L-w2DD7Csfn45rxFkoS_GZ6JrG3-n005Nlfhl1tbQstq6CxVKgHv6qiag/exec";
 
 // ================= CÀI ĐẶT HẠN MỨC HỌC SINH =================
 window.MAX_BOOKS_ALLOWED = 5; 
@@ -906,21 +924,50 @@ async function loadData(userEmail, isSilent = false){
   } catch (err) { console.error("Lỗi lấy dữ liệu:", err); }
 }
 
-// ================= LOAD KHO SÁCH =================
+// ================= LOAD KHO SÁCH CÓ CACHE NHANH =================
 async function loadCatalog(isSilent = false) {
   const catalogDiv = document.getElementById("bookCatalog");
   const loadingDiv = document.getElementById("loadingCatalog");
   const filterSelect = document.getElementById("categoryFilter");
   const refreshIndicator = document.getElementById("refreshIndicator");
-  
-  if (!isSilent) {
+
+  // 1. TẢI TỪ CACHE (BỘ NHỚ TRÌNH DUYỆT) LÊN TRƯỚC ĐỂ HIỂN THỊ LẬP TỨC
+  const cachedData = localStorage.getItem('library_catalog_cache_v2');
+  if (cachedData && !isSilent) {
+    try {
+      const cachedBooks = JSON.parse(cachedData);
+      if (cachedBooks.length > 0) {
+          allCatalogBooks = cachedBooks;
+          loadingDiv.style.display = "none";
+          refreshIndicator.style.display = "inline-block"; // Hiện báo hiệu đang đồng bộ ngầm
+          
+          // Tạo lại filter dropdown từ cache
+          let uniqueCategories = new Set();
+          allCatalogBooks.forEach(b => { if(b.phanLoai) uniqueCategories.add(b.phanLoai); });
+          const currentSelectedCat = filterSelect.value;
+          filterSelect.innerHTML = '<option value="all">📚 Tất cả thể loại</option>';
+          uniqueCategories.forEach(cat => {
+              const option = document.createElement("option");
+              option.value = cat;
+              option.textContent = `🔖 ${cat}`;
+              filterSelect.appendChild(option);
+          });
+          if (uniqueCategories.has(currentSelectedCat)) filterSelect.value = currentSelectedCat;
+          
+          filterCatalog();
+      }
+    } catch(e) { console.error("Lỗi đọc cache", e); }
+  }
+
+  if (!isSilent && allCatalogBooks.length === 0) {
     catalogDiv.innerHTML = "";
     loadingDiv.style.display = "block";
-  } else {
+  } else if (isSilent) {
     refreshIndicator.style.display = "inline-block";
   }
 
   try {
+    // 2. GỌI API CHẠY NGẦM ĐỂ ĐỒNG BỘ DỮ LIỆU MỚI NHẤT
     const response = await fetch(WEB_APP_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -929,11 +976,8 @@ async function loadCatalog(isSilent = false) {
     const result = await response.json();
     if(result.status !== "success") throw new Error();
 
-    allCatalogBooks = [];
+    let freshCatalogBooks = [];
     let uniqueCategories = new Set();
-    
-    if (!isSilent) loadingDiv.style.display = "none";
-    refreshIndicator.style.display = "none";
 
     result.data.forEach(row => {
       let titleOnly = row.tenSach;
@@ -947,41 +991,54 @@ async function loadCatalog(isSilent = false) {
       if(row.phanLoai) uniqueCategories.add(row.phanLoai);
       const conLaiInt = parseInt(row.conLai) || 0;
 
-      allCatalogBooks.push({
-          maSach: row.maSach, 
-          titleOnly: titleOnly, 
-          authorName: authorName, 
-          fullTitle: row.tenSach, 
-          phanLoai: row.phanLoai, 
+      const imageUrl = row.hinhAnh || row.hinh_anh || row.image || row.anhBia || row.anh || "";
+
+      freshCatalogBooks.push({
+          maSach: row.maSach,
+          titleOnly: titleOnly,
+          authorName: authorName,
+          fullTitle: row.tenSach,
+          phanLoai: row.phanLoai,
           conLai: conLaiInt,
+          imageUrl: imageUrl,
           searchText: `${row.maSach} ${row.tenSach}`.toLowerCase(),
           isAvailable: conLaiInt > 0
       });
     });
 
-    window.cart = window.cart.filter(cartBook => {
-        const bookInDb = allCatalogBooks.find(b => b.maSach === cartBook.maSach);
-        return bookInDb && bookInDb.isAvailable;
-    });
-    updateCartUI();
+    loadingDiv.style.display = "none";
+    refreshIndicator.style.display = "none";
 
-    const currentSelectedCat = filterSelect.value;
-    filterSelect.innerHTML = '<option value="all">📚 Tất cả thể loại</option>';
-    uniqueCategories.forEach(cat => {
-        const option = document.createElement("option");
-        option.value = cat;
-        option.textContent = `🔖 ${cat}`;
-        filterSelect.appendChild(option);
-    });
-    if (uniqueCategories.has(currentSelectedCat)) {
-        filterSelect.value = currentSelectedCat;
+    // 3. SO SÁNH VÀ CẬP NHẬT GIAO DIỆN NẾU CÓ THAY ĐỔI
+    if (JSON.stringify(freshCatalogBooks) !== JSON.stringify(allCatalogBooks)) {
+        allCatalogBooks = freshCatalogBooks;
+        // Lưu dữ liệu mới đè lên cache
+        localStorage.setItem('library_catalog_cache_v2', JSON.stringify(allCatalogBooks));
+
+        window.cart = window.cart.filter(cartBook => {
+            const bookInDb = allCatalogBooks.find(b => b.maSach === cartBook.maSach);
+            return bookInDb && bookInDb.isAvailable;
+        });
+        updateCartUI();
+
+        const currentSelectedCat = filterSelect.value;
+        filterSelect.innerHTML = '<option value="all">📚 Tất cả thể loại</option>';
+        uniqueCategories.forEach(cat => {
+            const option = document.createElement("option");
+            option.value = cat;
+            option.textContent = `🔖 ${cat}`;
+            filterSelect.appendChild(option);
+        });
+        if (uniqueCategories.has(currentSelectedCat)) {
+            filterSelect.value = currentSelectedCat;
+        }
+
+        filterCatalog();
     }
-
-    filterCatalog();
 
   } catch (err) {
     refreshIndicator.style.display = "none";
-    if (!isSilent) {
+    if (!isSilent && allCatalogBooks.length === 0) {
         loadingDiv.innerHTML = `<span style="color:red">Lỗi tải dữ liệu kho sách.</span>`;
     }
   }
@@ -1018,6 +1075,13 @@ function renderCatalog(books) {
       } else {
           btnHTML = `<button class="btn-borrow unavailable">Hết sách</button>`;
       }
+      
+      // XỬ LÝ ẢNH BÌA HOẶC ICON MẶC ĐỊNH
+      let coverHTML = `<div class="book-icon">📚</div>`;
+      if (b.imageUrl && b.imageUrl.trim() !== "") {
+          // Thêm hàm onerror để nếu link ảnh bị lỗi (chết link), nó sẽ tự fallback về Icon cuốn sách
+          coverHTML = `<img src="${b.imageUrl}" alt="Bìa sách" class="book-cover" onerror="this.onerror=null; this.outerHTML='<div class=\\'book-icon\\'>📚</div>'">`;
+      }
 
       const item = document.createElement("div");
       item.className = "list-item";
@@ -1026,7 +1090,7 @@ function renderCatalog(books) {
       item.innerHTML = `
         <div class="list-col-code">${b.maSach}</div>
         <div class="list-col-info">
-          <div class="book-icon">📚</div>
+          ${coverHTML}
           <div class="book-title-group">
             <h4>${b.titleOnly}</h4>
             <p>✍️ ${b.authorName}</p>
@@ -1231,7 +1295,7 @@ async function checkLibraryCard(userEmail) {
           role: baseRole 
       };
 
-      // ĐÃ THÊM: TRUYỀN DỮ LIỆU ĐỊNH DANH SANG TRANG FEEDBACK (IFRAME)
+      // TRUYỀN DỮ LIỆU ĐỊNH DANH SANG TRANG FEEDBACK (IFRAME)
       const fbIframe = document.getElementById('feedback-iframe');
       if(fbIframe) {
           const params = new URLSearchParams({
@@ -1322,6 +1386,21 @@ window.editPersonalInfo = async function() {
     const phoneChanged = formValues.newPhone !== currentPhone;
 
     if (!emailChanged && !phoneChanged) return;
+
+    // BẢNG THÔNG BÁO CẢNH BÁO KHI HỌC SINH TỰ ĐỔI EMAIL
+    if (emailChanged) {
+        const confirmChange = await Swal.fire({
+            title: 'CẢNH BÁO QUAN TRỌNG!',
+            html: `Việc đổi sang Email mới sẽ làm <b>xóa toàn bộ lịch sử mượn sách hiện tại</b> của bạn trên hệ thống!<br><br>Bạn có chắc chắn muốn đổi sang Email: <b>${formValues.newEmail}</b> không?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Tôi hiểu và muốn đổi',
+            cancelButtonText: 'Hủy'
+        });
+        if (!confirmChange.isConfirmed) return;
+    }
 
     let otpMessage = ""; let targetSend = ""; let inputsHtml = "";
     const otpInputAttr = `type="text" inputmode="numeric" maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '')"`;
@@ -1437,7 +1516,7 @@ window.editPersonalInfo = async function() {
         // 1. Cập nhật thẻ trên Firebase
         await updateDoc(docRef, { phone: formValues.newPhone, email: formValues.newEmail });
         
-        // 2. Gửi lệnh báo cho Excel cập nhật (Đồng bộ Email lịch sử)
+        // 2. Gửi lệnh báo cho Excel cập nhật (Đồng bộ Xóa dữ liệu cũ)
         await fetch(WEB_APP_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -1450,7 +1529,7 @@ window.editPersonalInfo = async function() {
         });
         
         if (emailChanged) {
-             await Swal.fire({title: 'Hoàn tất!', text: 'Email đã được đổi! Toàn bộ lịch sử sách đang mượn đã được tự động chuyển sang Email mới. Vui lòng đăng nhập lại.', icon: 'success'});
+             await Swal.fire({title: 'Hoàn tất!', text: 'Email đã được đổi! Toàn bộ lịch sử mượn sách liên kết với Email cũ đã được xoá khỏi hệ thống. Vui lòng đăng nhập lại.', icon: 'success'});
              window.logout(); 
         } else {
              Swal.fire({title: 'Hoàn tất!', text: 'Số điện thoại đã được cập nhật đồng bộ.', icon: 'success', timer: 2000, showConfirmButton: false});
