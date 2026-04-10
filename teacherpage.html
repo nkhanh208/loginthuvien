@@ -205,30 +205,31 @@ body{
 
 /* ================= CARD ================= */
 .card{
-  background:rgba(255,255,255,0.7);
+  background:rgba(255,255,255,0.65);
   backdrop-filter:blur(20px);
   padding:16px;
   border-radius:20px;
   margin-bottom:12px;
   transition:0.25s ease;
-  border-left:6px solid rgba(255,255,255,0.6);
-  box-shadow:0 4px 15px rgba(0,0,0,0.03);
+  border-left:6px solid rgba(255,255,255,0.8);
+  box-shadow:0 6px 18px rgba(0,0,0,0.05);
+  color: #1e293b;
 }
 
 .card:hover{
   transform:translateY(-4px);
-  box-shadow:0 12px 25px rgba(0,0,0,0.08);
+  box-shadow:0 15px 35px rgba(0,0,0,0.1);
   background: #ffffff;
 }
 
 .pending{ border-left-color:#f97316; } 
-.borrowing{ border-left-color:#3b82f6; } 
-.overdue{ border-left-color:#ef4444; }
+.borrowing{ border-left-color:#3b82f6; }
+.overdue{ border-left-color:#ff3b30; }
 .returned{ border-left-color:#10b981; }
 
 /* ================= BADGE ================= */
 .badge{
-  background:rgba(0,0,0,0.7);
+  background:rgba(51, 65, 85, 0.9);
   color:white;
   font-size:12px;
   padding:4px 10px;
@@ -266,7 +267,7 @@ body{
   padding: 12px 20px 12px 40px;
   border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.8);
-  background: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.7);
   font-size: 15px;
   outline: none;
   box-shadow: 0 4px 15px rgba(0,0,0,0.03);
@@ -274,7 +275,7 @@ body{
 }
 
 .search-box input:focus {
-  background: #ffffff;
+  background: rgba(255,255,255,0.95);
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
 }
 
@@ -285,7 +286,7 @@ body{
   top: 50%;
   transform: translateY(-50%);
   font-size: 16px;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .filter-box {
@@ -298,7 +299,7 @@ body{
   padding: 12px 20px;
   border-radius: 12px;
   border: 1px solid rgba(255,255,255,0.8);
-  background: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.7);
   font-size: 15px;
   outline: none;
   box-shadow: 0 4px 15px rgba(0,0,0,0.03);
@@ -343,16 +344,16 @@ body{
   display: flex;
   align-items: center;
   padding: 15px 20px;
-  background: rgba(255,255,255,0.6);
+  background: rgba(255,255,255,0.55);
   border-radius: 16px;
   margin-bottom: 10px;
   transition: 0.2s;
-  border: 1px solid rgba(255,255,255,0.8);
+  border: 1px solid rgba(255,255,255,0.6);
 }
 
 .list-item:hover {
-  background: #ffffff;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  background: rgba(255,255,255,0.85);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.04);
   transform: translateY(-2px);
 }
 
@@ -364,25 +365,44 @@ body{
   gap: 15px;
 }
 
+/* Biểu tượng sách mặc định (nếu không có ảnh) */
 .book-icon {
-  font-size: 30px;
-  background: rgba(255,255,255,0.8);
-  padding: 10px;
+  font-size: 35px;
+  background: rgba(255,255,255,0.6);
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 80px;
+  flex-shrink: 0;
+}
+
+/* Ảnh bìa sách mới thêm vào */
+.book-cover {
+  width: 60px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.8);
+  background-color: white; 
 }
 
 .book-title-group h4 { margin: 0; font-size: 15px; color: #1e293b; margin-bottom: 4px;}
 .book-title-group p { margin: 0; font-size: 12px; color: #64748b; }
 
 .cat-badge {
-  background: #e2e8f0;
+  background: rgba(226, 232, 240, 0.8);
   color: #475569;
   padding: 4px 12px;
   border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
   display: inline-block;
+  border: 1px solid #cbd5e1;
 }
 
 .list-col-stock {
@@ -406,31 +426,31 @@ body{
 }
 
 .btn-borrow.add {
-  background: #0ea5e9; 
+  background: #0284c7; 
   color: white;
-  box-shadow: 0 4px 10px rgba(14, 165, 233, 0.3);
+  box-shadow: 0 4px 10px rgba(2, 132, 199, 0.2);
 }
 
 .btn-borrow.add:hover {
-  background: #0284c7;
+  background: #0369a1;
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(14, 165, 233, 0.4);
+  box-shadow: 0 6px 15px rgba(2, 132, 199, 0.3);
 }
 
 .btn-borrow.remove {
-  background: #f43f5e; 
+  background: #ef4444; 
   color: white;
-  box-shadow: 0 4px 10px rgba(244, 63, 94, 0.3);
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
 }
 
 .btn-borrow.remove:hover {
-  background: #e11d48;
+  background: #dc2626;
   transform: translateY(-2px);
 }
 
 .btn-borrow.unavailable {
-  background: #e2e8f0;
-  color: #94a3b8;
+  background: #cbd5e1;
+  color: #64748b;
   cursor: not-allowed;
   pointer-events: none;
 }
@@ -446,7 +466,7 @@ body{
   padding: 15px 25px;
   border-radius: 20px;
   box-shadow: 0 15px 40px rgba(0,0,0,0.1);
-  border: 1px solid rgba(255,255,255,1);
+  border: 1px solid rgba(255,255,255,0.8);
   display: flex;
   flex-wrap: wrap; /* Cho phép rớt dòng khi hẹp */
   justify-content: center;
@@ -477,16 +497,16 @@ body{
 .cart-count {
   font-size: 20px;
   font-weight: 800;
-  color: #0f172a;
+  color: #1e293b;
   white-space: nowrap;
 }
 
 .cart-count span {
-  color: #0ea5e9;
+  color: #0284c7;
 }
 
 .btn-checkout {
-  background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); 
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
   color: white;
   border: none;
   padding: 12px 25px;
@@ -494,7 +514,7 @@ body{
   font-weight: bold;
   font-size: 15px;
   cursor: pointer;
-  box-shadow: 0 8px 20px rgba(217, 119, 6, 0.3);
+  box-shadow: 0 8px 20px rgba(5, 150, 105, 0.2);
   transition: 0.3s;
   display: flex;
   align-items: center;
@@ -504,36 +524,34 @@ body{
 
 .btn-checkout:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 12px 25px rgba(217, 119, 6, 0.4);
+  box-shadow: 0 12px 25px rgba(5, 150, 105, 0.3);
 }
 .btn-checkout:disabled {
   opacity: 0.7;
   cursor: not-allowed;
-  background: #cbd5e1;
+  background: #94a3b8;
   box-shadow: none;
 }
 
-
-/* ================= DIGITAL CARD (GIAO DIỆN VIP) ================= */
+/* ================= DIGITAL CARD ================= */
 .digital-card-wrapper { display: flex; justify-content: center; align-items: center; padding: 30px 10px; }
-/* Nền xanh đen sang trọng */
-.digital-card { background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%); color: white; width: 100%; max-width: 380px; border-radius: 20px; padding: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: relative; overflow: hidden; border: 1px solid rgba(255,215,0,0.3); }
-.digital-card::before { content: ''; position: absolute; width: 250px; height: 250px; background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%); top: -100px; right: -100px; }
-.digital-card::after { content: 'VIP'; absolute; font-size: 120px; font-weight: 900; opacity: 0.04; bottom: -30px; right: 10px; line-height: 1; font-style: italic; }
+.digital-card { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #f8fafc; width: 100%; max-width: 380px; border-radius: 20px; padding: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); position: relative; overflow: hidden; border: 1px solid #334155;}
+.digital-card::before { content: ''; position: absolute; width: 200px; height: 200px; background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); top: -100px; right: -100px; }
 .card-content { position: relative; z-index: 2; }
 .card-header-top { display: flex; justify-content: space-between; margin-bottom: 25px; }
-.card-brand { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #fbbf24; font-weight: bold; }
-.card-name { font-size: 24px; font-weight: 800; margin-top: 5px; color: #f8fafc; }
-.card-role { font-size: 13px; background: rgba(251, 191, 36, 0.2); color: #fbbf24; display: inline-block; padding: 5px 12px; border-radius: 8px; margin-top: 10px; font-weight: 600; border: 1px solid rgba(251, 191, 36, 0.3); }
+.card-brand { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.7; font-weight: bold; color: #cbd5e1;}
+.card-name { font-size: 24px; font-weight: 800; margin-top: 5px; color: white;}
+.card-role { font-size: 13px; background: linear-gradient(135deg, #fbbf24, #d97706); display: inline-block; padding: 5px 12px; border-radius: 8px; margin-top: 10px; font-weight: bold; color: white; box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4);}
 .card-detail-row { display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 12px; align-items: flex-end; }
 .card-detail-label { font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 600; }
 .card-detail-value { font-family: monospace; font-size: 18px; font-weight: bold; color: #e2e8f0; }
-.card-detail-text { font-size: 14px; font-weight: 500; word-break: break-all; color: #e2e8f0; }
-.no-card-wrapper { text-align: center; padding: 50px 20px; background: rgba(255,255,255,0.6); backdrop-filter: blur(30px); border-radius: 28px; margin-top: 20px; }
+.card-detail-text { font-size: 14px; font-weight: 500; word-break: break-all; color: #e2e8f0;}
+.no-card-wrapper { text-align: center; padding: 50px 20px; background: rgba(255,255,255,0.5); backdrop-filter: blur(30px); border-radius: 28px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.7); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+.btn-register-link { display: inline-block; margin-top: 20px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: white; text-decoration: none; padding: 14px 28px; border-radius: 16px; font-weight: bold; font-size: 16px; transition: 0.3s; box-shadow: 0 8px 20px rgba(2, 132, 199, 0.2); }
 
-/* Edit Btn cho GV (Có thể mở lại nếu cần) */
-.btn-edit-card { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,215,0,0.3); color: #fbbf24; padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; width: 100%;}
-.btn-edit-card:hover { background: rgba(251, 191, 36, 0.2); }
+/* Edit Btn */
+.btn-edit-card { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #cbd5e1; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; width: 100%;}
+.btn-edit-card:hover { background: rgba(255,255,255,0.2); color: white;}
 
 /* ================= FEEDBACK ================= */
 #feedback iframe{ flex:1; width:100%; border:none; border-radius:28px; backdrop-filter:blur(20px); }
@@ -553,7 +571,7 @@ body{
     .list-item { flex-direction: column; align-items: flex-start; gap: 10px; position: relative; padding-bottom: 60px;}
     .list-col-code, .list-col-info, .list-col-cat, .list-col-stock { width: 100%; text-align: left; }
     .list-col-action { width: 100%; position: absolute; bottom: 15px; left: 20px; text-align: left; }
-    .list-col-stock::before { content: 'Còn lại: '; font-weight: normal; color: #94a3b8;}
+    .list-col-stock::before { content: 'Còn lại: '; font-weight: normal; color: #64748b;}
     .floating-cart { gap: 10px; width: 95%; text-align: center; }
 }
 </style>
@@ -567,13 +585,13 @@ body{
     <img id="avatar" src="https://i.pravatar.cc/150" alt="Avatar">
     <h3 id="name">Đang tải...</h3>
     <p id="email"></p>
-    <div class="vip-badge-sidebar" id="sidebar-role">Tài Khoản VIP</div>
+    <span class="vip-badge-sidebar">Giáo viên</span>
   </div>
 
-  <button class="nav-btn active" onclick="showSection('home', this)">📚 Tổng quan</button>
+  <button class="nav-btn active" onclick="showSection('home', this)">📚 Trang chính</button>
   <button class="nav-btn" onclick="showSection('catalog', this)">🔍 Mượn sách</button>
   <button class="nav-btn" onclick="showSection('history', this)">📖 Lịch sử mượn</button>
-  <button class="nav-btn" onclick="showSection('libraryCard', this)">🎟️ Thẻ Giáo Viên</button>
+  <button class="nav-btn" onclick="showSection('libraryCard', this)">🎟️ Thẻ thư viện</button>
   <button class="nav-btn" onclick="showSection('feedback', this)">💬 Feedback</button>
 
   <button class="logout" onclick="logout()">Đăng xuất</button>
@@ -584,20 +602,20 @@ body{
   <!-- TRANG CHÍNH -->
   <div id="home" class="section active">
     
-    <!-- BANNER HIỂN THỊ HẠN MỨC MƯỢN SÁCH VIP -->
-    <div style="background:rgba(255,255,255,0.7); backdrop-filter:blur(20px); padding:16px 24px; border-radius:20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; border:1px solid rgba(255,255,255,0.8); box-shadow:0 4px 15px rgba(0,0,0,0.03);">
+    <!-- BANNER HIỂN THỊ HẠN MỨC MƯỢN SÁCH VIP (GIÁO VIÊN) -->
+    <div style="background:rgba(255,255,255,0.6); backdrop-filter:blur(20px); padding:16px 24px; border-radius:20px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; border:1px solid rgba(255,255,255,0.8); box-shadow:0 6px 18px rgba(0,0,0,0.03);">
       <div style="font-weight: 600; color: #1e293b; display: flex; align-items: center; gap: 12px;">
-        <div style="background: linear-gradient(135deg, #fbbf24, #d97706); color: white; width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(217,119,6,0.3);">
-          <i class="fas fa-book-open"></i>
+        <div style="background: linear-gradient(135deg, #0284c7, #0369a1); color: white; width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(2, 132, 199,0.2);">
+          <i class="fas fa-crown"></i>
         </div>
         <div>
-          <div style="font-size: 15px; color: #0f172a;">Hạn mức Đặc quyền VIP</div>
+          <div style="font-size: 15px; color: #0f172a;">Hạn mức mượn sách VIP</div>
           <div style="font-size: 12px; color: #64748b; font-weight: normal; margin-top: 2px;">Mỗi lần đặt mượn tối đa 3 cuốn</div>
         </div>
       </div>
       <div style="text-align: right;">
         <div style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; margin-bottom: 2px;">SÁCH ĐƯỢC PHÉP MƯỢN THÊM</div>
-        <div style="font-size: 24px; font-weight: 800; color: #d97706; line-height: 1;"><span id="quota-remaining">0</span><span style="font-size:16px; color:#94a3b8; font-weight:700;"> / <span id="quota-total">10</span></span></div>
+        <div style="font-size: 24px; font-weight: 800; color: #0284c7; line-height: 1;"><span id="quota-remaining">0</span><span style="font-size:16px; color:#94a3b8; font-weight:700;"> / <span id="quota-total">10</span></span></div>
       </div>
     </div>
 
@@ -607,7 +625,7 @@ body{
         <div id="pendingList"></div>
       </div>
       <div class="column">
-        <h3>🔵 Đang mượn <span class="badge" id="borrowCount" style="background:#3b82f6;">0</span></h3>
+        <h3>🔵 Đang mượn <span class="badge" id="borrowCount" style="background:#0284c7;">0</span></h3>
         <div id="borrowList"></div>
       </div>
       <div class="column">
@@ -620,8 +638,8 @@ body{
   <!-- TRA CỨU MƯỢN SÁCH (CÓ GIỎ HÀNG) -->
   <div id="catalog" class="section">
     <h2 style="margin-bottom: 20px; color: #1e293b; display: flex; justify-content: space-between; align-items: center;">
-      <span>Kho sách Thư viện</span>
-      <span id="refreshIndicator" style="font-size: 12px; color: #94a3b8; display: none; background: rgba(0,0,0,0.05); padding: 4px 10px; border-radius: 12px;">Đang làm mới...</span>
+      <span>Tra cứu & Mượn sách</span>
+      <span id="refreshIndicator" style="font-size: 12px; color: #64748b; display: none; background: rgba(0,0,0,0.05); padding: 4px 10px; border-radius: 12px;">Đang làm mới...</span>
     </h2>
     
     <div class="catalog-controls">
@@ -656,7 +674,7 @@ body{
     <!-- THANH GIỎ HÀNG NỔI Ở ĐÁY MÀN HÌNH -->
     <div id="floatingCart" class="floating-cart">
         <div class="cart-info">
-            <span class="cart-title">Giỏ sách mượn</span>
+            <span class="cart-title">Giỏ hàng</span>
             <div class="cart-count"><span id="cartCountNum">0</span> / <span id="maxCartAllowed">3</span> cuốn</div>
         </div>
         
@@ -665,15 +683,24 @@ body{
             <span style="font-size: 11px; color: #64748b; font-weight: 600;">Hạn trả dự kiến</span>
             <select id="borrowDuration" style="padding: 5px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 13px; outline: none; background: white;">
                 <option value="1">1 Ngày</option>
+                <option value="2">2 Ngày</option>
                 <option value="3">3 Ngày</option>
+                <option value="4">4 Ngày</option>
+                <option value="5">5 Ngày</option>
+                <option value="6">6 Ngày</option>
                 <option value="7">7 Ngày</option>
-                <option value="14" selected>14 Ngày</option>
-                <option value="30">30 Ngày (Đặc quyền VIP)</option>
+                <option value="8">8 Ngày</option>
+                <option value="9">9 Ngày</option>
+                <option value="10">10 Ngày</option>
+                <option value="11">11 Ngày</option>
+                <option value="12">12 Ngày</option>
+                <option value="13">13 Ngày</option>
+                <option value="14">14 Ngày</option>
             </select>
         </div>
 
         <button id="btnCheckout" class="btn-checkout" onclick="checkoutCart()">
-            🛒 Xác nhận mượn
+            🛒 Đặt hàng ngay
         </button>
     </div>
 
@@ -682,7 +709,7 @@ body{
   <!-- TRANG LỊCH SỬ -->
   <div id="history" class="section">
     <h2 style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px; color: #1e293b;">
-      <span>📖 Lịch sử mượn (Đã trả)</span>
+      <span>📖 Lịch sử mượn</span>
       <span class="badge returned" id="historyCount" style="background:#10b981; padding: 6px 14px; font-size: 15px;">0</span>
     </h2>
     <div id="historyList"></div>
@@ -690,20 +717,20 @@ body{
 
   <!-- THẺ THƯ VIỆN -->
   <div id="libraryCard" class="section">
-    <h2 style="color: #1e293b;">🎟️ Thẻ Giáo Viên Của Bạn</h2>
-    <div id="loading-card" style="text-align: center; padding: 40px;"><p>Đang kiểm tra hệ thống thẻ...</p></div>
+    <h2 style="color: #1e293b;">🎟️ Thẻ Thư Viện Của Bạn</h2>
+    <div id="loading-card" style="text-align: center; padding: 40px; color: #64748b;"><p>Đang kiểm tra hệ thống thẻ...</p></div>
     <div id="has-card-view" style="display: none;">
       <div class="digital-card-wrapper">
         <div class="digital-card">
           <div class="card-content">
             <div class="card-header-top">
               <div>
-                <div class="card-brand">NHC TEACHER LIBRARY</div>
+                <div class="card-brand">NHC Library</div>
                 <div class="card-name" id="my-card-name">---</div>
                 <div class="card-role" id="my-card-role">---</div>
               </div>
               <div class="flex-shrink-0">
-                <img src="logo.png" alt="Logo NHC" style="width: 55px; height: 55px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));" onerror="this.style.display='none'">
+                <img src="logo.png" alt="Logo NHC" style="width: 55px; height: 55px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.4));" onerror="this.style.display='none'">
               </div>
             </div>
             <div class="card-detail-row">
@@ -711,7 +738,7 @@ body{
               <span class="card-detail-value" id="my-card-id">---</span>
             </div>
             <div class="card-detail-row" style="border: none; padding-bottom: 0;">
-              <span class="card-detail-label">Email Liên Hệ</span>
+              <span class="card-detail-label">Email</span>
               <span class="card-detail-text" id="my-card-email">---</span>
             </div>
             <button onclick="editPersonalInfo()" class="btn-edit-card">
@@ -721,10 +748,10 @@ body{
         </div>
       </div>
     </div>
-    
     <div id="no-card-view" class="no-card-wrapper" style="display: none;">
-      <h3 style="font-size: 20px; margin-bottom: 10px; color: #1e293b;">Tài khoản chưa được cấp Thẻ Giáo Viên</h3>
-      <p style="color: #475569;">Hệ thống không tìm thấy thông tin thẻ của Thầy/Cô. Vui lòng liên hệ Quản trị viên (Thủ thư) để được cấp thẻ tự động vào tài khoản.</p>
+      <h3 style="font-size: 20px; margin-bottom: 10px; color: #1e293b;">Bạn chưa có thẻ thư viện</h3>
+      <p style="color: #475569;">Vui lòng đăng ký thông tin để hệ thống tạo thẻ điện tử cho bạn nhé.</p>
+      <a href="card.html" class="btn-register-link">Tạo thẻ ngay</a>
     </div>
   </div>
 
@@ -765,18 +792,18 @@ const cardFirebaseConfig = {
 const cardApp = initializeApp(cardFirebaseConfig, "cardApp");
 const cardDb = getFirestore(cardApp);
 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzR2A37oCUMbdmW8gtbyojHXJ8TSMHR6FGQJ6dxM9fgM66pK0eVjA8WQvk4w7skLI9Cig/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbweY2qWa5jH_L-w2DD7Csfn45rxFkoS_GZ6JrG3-n005Nlfhl1tbQstq6CxVKgHv6qiag/exec";
 
-// ================= CÀI ĐẶT HẠN MỨC VIP =================
+// ================= CÀI ĐẶT HẠN MỨC VIP (GIÁO VIÊN) =================
 window.MAX_BOOKS_ALLOWED = 10; 
-window.MAX_PER_CHECKOUT = 3; // Giới hạn 3 cuốn 1 lần ấn nút mượn
+window.MAX_PER_CHECKOUT = 3; 
 
 let unsubscribeSnapshot = null;
 let allCatalogBooks = []; 
 window.userLibraryData = null;
 window.hasCheckedCard = false;
 window.cart = []; 
-window.currentHeldBooks = 0; 
+window.currentHeldBooks = 0;
 
 // Cập nhật giao diện thanh Hạn mức
 function updateQuotaUI() {
@@ -795,13 +822,17 @@ onAuthStateChanged(auth, async (user)=>{
     window.location.href="index.html";
     return;
   }
-
-  // BẢO VỆ TRANG CHỐNG HỌC SINH VÀO NHẦM
+  
   const email = user.email ? user.email.toLowerCase().trim() : "";
   const teacherEmails = ["lop12a3@nhc.edu.vn", "bckapp001@gmail.com", "hieutruong@nhc.edu.vn", "thuthu@nhc.edu.vn"];
   const isTeacher = teacherEmails.includes(email) || email.endsWith("@gv.nhc.edu.vn");
-  if (!isTeacher && user.uid !== "idn9CUepaSOJOAL0Ag3ezSoQE4m1") { window.location.href = "studentpage.html"; return; }
-
+  
+  // NẾU KHÔNG PHẢI GIÁO VIÊN MÀ VÀO TRANG NÀY => ĐÁ VỀ TRANG HỌC SINH
+  if (!isTeacher && user.uid !== "idn9CUepaSOJOAL0Ag3ezSoQE4m1") { 
+      window.location.href = "studentpage.html"; 
+      return; 
+  }
+  
   const userRef = doc(db, "users", user.uid);
   try { await updateDoc(userRef, { online: true, lastSeen: serverTimestamp() }); } catch (error) {}
 
@@ -809,16 +840,15 @@ onAuthStateChanged(auth, async (user)=>{
   unsubscribeSnapshot = onSnapshot(userRef, async (snap)=>{
     if(!snap.exists()) return;
     if(snap.data().status === "blocked"){
-      alert("Tài khoản của Thầy/Cô đã bị khóa!");
+      alert("Tài khoản của bạn đã bị khóa!");
       await signOut(auth);
       window.location.href="index.html";
     }
   });
 
   document.getElementById("avatar").src = user.photoURL || "https://i.pravatar.cc/150";
-  // Xóa email khỏi slidebar để bảo mật thông tin
   document.getElementById("name").textContent = user.displayName || "Thầy/Cô";
-  document.getElementById("email").textContent = "";
+  document.getElementById("email").textContent = ""; 
 
   if(email) {
       loadData(email, false); 
@@ -886,7 +916,7 @@ async function loadData(userEmail, isSilent = false){
         }
         else if(finalStatus === "Đang mượn"){
           card.classList.add("borrowing");
-          card.innerHTML=`<strong>${book}</strong><div style="margin-top:4px; font-size:13px;">Hạn trả: ${row.returnDate || "Không có"}</div><div style="font-size:13px; color:#3b82f6;">Trạng thái: Đang mượn</div>`;
+          card.innerHTML=`<strong>${book}</strong><div style="margin-top:4px; font-size:13px;">Hạn trả: ${row.returnDate || "Không có"}</div><div style="font-size:13px; color:#0284c7;">Trạng thái: Đang mượn</div>`;
           borrowList.appendChild(card); borrowCount++;
         }
         else if(finalStatus === "Quá hạn"){
@@ -921,21 +951,50 @@ async function loadData(userEmail, isSilent = false){
   } catch (err) { console.error("Lỗi lấy dữ liệu:", err); }
 }
 
-// ================= LOAD KHO SÁCH =================
+// ================= LOAD KHO SÁCH CÓ CACHE =================
 async function loadCatalog(isSilent = false) {
   const catalogDiv = document.getElementById("bookCatalog");
   const loadingDiv = document.getElementById("loadingCatalog");
   const filterSelect = document.getElementById("categoryFilter");
   const refreshIndicator = document.getElementById("refreshIndicator");
-  
-  if (!isSilent) {
+
+  // 1. TẢI TỪ CACHE (BỘ NHỚ TRÌNH DUYỆT) LÊN TRƯỚC ĐỂ HIỂN THỊ LẬP TỨC
+  const cachedData = localStorage.getItem('library_catalog_cache_v2');
+  if (cachedData && !isSilent) {
+    try {
+      const cachedBooks = JSON.parse(cachedData);
+      if (cachedBooks.length > 0) {
+          allCatalogBooks = cachedBooks;
+          loadingDiv.style.display = "none";
+          refreshIndicator.style.display = "inline-block"; // Hiện báo hiệu đang đồng bộ ngầm
+          
+          // Tạo lại filter dropdown từ cache
+          let uniqueCategories = new Set();
+          allCatalogBooks.forEach(b => { if(b.phanLoai) uniqueCategories.add(b.phanLoai); });
+          const currentSelectedCat = filterSelect.value;
+          filterSelect.innerHTML = '<option value="all">📚 Tất cả thể loại</option>';
+          uniqueCategories.forEach(cat => {
+              const option = document.createElement("option");
+              option.value = cat;
+              option.textContent = `🔖 ${cat}`;
+              filterSelect.appendChild(option);
+          });
+          if (uniqueCategories.has(currentSelectedCat)) filterSelect.value = currentSelectedCat;
+          
+          filterCatalog();
+      }
+    } catch(e) { console.error("Lỗi đọc cache", e); }
+  }
+
+  if (!isSilent && allCatalogBooks.length === 0) {
     catalogDiv.innerHTML = "";
     loadingDiv.style.display = "block";
-  } else {
+  } else if (isSilent) {
     refreshIndicator.style.display = "inline-block";
   }
 
   try {
+    // 2. GỌI API CHẠY NGẦM ĐỂ ĐỒNG BỘ DỮ LIỆU MỚI NHẤT
     const response = await fetch(WEB_APP_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -944,11 +1003,8 @@ async function loadCatalog(isSilent = false) {
     const result = await response.json();
     if(result.status !== "success") throw new Error();
 
-    allCatalogBooks = [];
+    let freshCatalogBooks = [];
     let uniqueCategories = new Set();
-    
-    if (!isSilent) loadingDiv.style.display = "none";
-    refreshIndicator.style.display = "none";
 
     result.data.forEach(row => {
       let titleOnly = row.tenSach;
@@ -962,41 +1018,54 @@ async function loadCatalog(isSilent = false) {
       if(row.phanLoai) uniqueCategories.add(row.phanLoai);
       const conLaiInt = parseInt(row.conLai) || 0;
 
-      allCatalogBooks.push({
-          maSach: row.maSach, 
-          titleOnly: titleOnly, 
-          authorName: authorName, 
-          fullTitle: row.tenSach, 
-          phanLoai: row.phanLoai, 
+      const imageUrl = row.hinhAnh || row.hinh_anh || row.image || row.anhBia || row.anh || "";
+
+      freshCatalogBooks.push({
+          maSach: row.maSach,
+          titleOnly: titleOnly,
+          authorName: authorName,
+          fullTitle: row.tenSach,
+          phanLoai: row.phanLoai,
           conLai: conLaiInt,
+          imageUrl: imageUrl,
           searchText: `${row.maSach} ${row.tenSach}`.toLowerCase(),
           isAvailable: conLaiInt > 0
       });
     });
 
-    window.cart = window.cart.filter(cartBook => {
-        const bookInDb = allCatalogBooks.find(b => b.maSach === cartBook.maSach);
-        return bookInDb && bookInDb.isAvailable;
-    });
-    updateCartUI();
+    loadingDiv.style.display = "none";
+    refreshIndicator.style.display = "none";
 
-    const currentSelectedCat = filterSelect.value;
-    filterSelect.innerHTML = '<option value="all">📚 Tất cả thể loại</option>';
-    uniqueCategories.forEach(cat => {
-        const option = document.createElement("option");
-        option.value = cat;
-        option.textContent = `🔖 ${cat}`;
-        filterSelect.appendChild(option);
-    });
-    if (uniqueCategories.has(currentSelectedCat)) {
-        filterSelect.value = currentSelectedCat;
+    // 3. SO SÁNH VÀ CẬP NHẬT GIAO DIỆN NẾU CÓ THAY ĐỔI
+    if (JSON.stringify(freshCatalogBooks) !== JSON.stringify(allCatalogBooks)) {
+        allCatalogBooks = freshCatalogBooks;
+        // Lưu dữ liệu mới đè lên cache
+        localStorage.setItem('library_catalog_cache_v2', JSON.stringify(allCatalogBooks));
+
+        window.cart = window.cart.filter(cartBook => {
+            const bookInDb = allCatalogBooks.find(b => b.maSach === cartBook.maSach);
+            return bookInDb && bookInDb.isAvailable;
+        });
+        updateCartUI();
+
+        const currentSelectedCat = filterSelect.value;
+        filterSelect.innerHTML = '<option value="all">📚 Tất cả thể loại</option>';
+        uniqueCategories.forEach(cat => {
+            const option = document.createElement("option");
+            option.value = cat;
+            option.textContent = `🔖 ${cat}`;
+            filterSelect.appendChild(option);
+        });
+        if (uniqueCategories.has(currentSelectedCat)) {
+            filterSelect.value = currentSelectedCat;
+        }
+
+        filterCatalog();
     }
-
-    filterCatalog();
 
   } catch (err) {
     refreshIndicator.style.display = "none";
-    if (!isSilent) {
+    if (!isSilent && allCatalogBooks.length === 0) {
         loadingDiv.innerHTML = `<span style="color:red">Lỗi tải dữ liệu kho sách.</span>`;
     }
   }
@@ -1008,11 +1077,10 @@ function renderCatalog(books) {
     catalogDiv.innerHTML = "";
 
     if (books.length === 0) {
-        catalogDiv.innerHTML = "<div style='text-align:center; padding: 20px; color:#777;'>Không tìm thấy sách phù hợp.</div>";
+        catalogDiv.innerHTML = "<div style='text-align:center; padding: 20px; color:#64748b;'>Không tìm thấy sách phù hợp.</div>";
         return;
     }
 
-    // TÍNH TOÁN GIỚI HẠN KÉP (Giới hạn giỏ <= 3 & Giới hạn tổng <= 10)
     let maxCartAllowed = Math.min(window.MAX_PER_CHECKOUT, window.MAX_BOOKS_ALLOWED - window.currentHeldBooks);
     if(maxCartAllowed < 0) maxCartAllowed = 0;
 
@@ -1026,7 +1094,7 @@ function renderCatalog(books) {
           if (isInCart) {
               btnHTML = `<button onclick="toggleCart('${b.maSach}', '${b.fullTitle.replace(/'/g, "\\'")}')" class="btn-borrow remove">❌ Bỏ chọn</button>`;
           } else if (isCartFull) {
-               let reasonText = window.cart.length >= window.MAX_PER_CHECKOUT ? `Tối đa ${window.MAX_PER_CHECKOUT} cuốn/lần` : "Đạt hạn mức tổng VIP";
+               let reasonText = window.cart.length >= window.MAX_PER_CHECKOUT ? `Tối đa ${window.MAX_PER_CHECKOUT} cuốn/lần` : "Đạt hạn mức tổng";
                btnHTML = `<button class="btn-borrow unavailable" title="${reasonText}">${reasonText}</button>`;
           } else {
                btnHTML = `<button onclick="toggleCart('${b.maSach}', '${b.fullTitle.replace(/'/g, "\\'")}')" class="btn-borrow add">➕ Thêm vào giỏ</button>`;
@@ -1034,15 +1102,21 @@ function renderCatalog(books) {
       } else {
           btnHTML = `<button class="btn-borrow unavailable">Hết sách</button>`;
       }
+      
+      // XỬ LÝ ẢNH BÌA HOẶC ICON MẶC ĐỊNH
+      let coverHTML = `<div class="book-icon">📚</div>`;
+      if (b.imageUrl && b.imageUrl.trim() !== "") {
+          coverHTML = `<img src="${b.imageUrl}" alt="Bìa sách" class="book-cover" onerror="this.onerror=null; this.outerHTML='<div class=\\'book-icon\\'>📚</div>'">`;
+      }
 
       const item = document.createElement("div");
       item.className = "list-item";
-      if (isInCart) item.style.border = "1px solid #0ea5e9"; 
+      if (isInCart) item.style.border = "1px solid #0284c7"; 
       
       item.innerHTML = `
         <div class="list-col-code">${b.maSach}</div>
         <div class="list-col-info">
-          <div class="book-icon">📚</div>
+          ${coverHTML}
           <div class="book-title-group">
             <h4>${b.titleOnly}</h4>
             <p>✍️ ${b.authorName}</p>
@@ -1088,8 +1162,8 @@ window.toggleCart = function(maSach, fullTitle) {
         if (window.cart.length >= maxCartAllowed) {
             let errorMsg = window.cart.length >= window.MAX_PER_CHECKOUT 
                 ? `Thư viện chỉ cho phép đặt mượn tối đa ${window.MAX_PER_CHECKOUT} cuốn sách trong một giao dịch.`
-                : `Thầy/Cô hiện đang giữ ${window.currentHeldBooks} cuốn. Hạn mức đặc quyền chỉ còn được mượn thêm ${maxCartAllowed} cuốn nữa.`;
-            Swal.fire({ title: "Đạt giới hạn VIP", text: errorMsg, icon: "warning" });
+                : `Thầy/Cô hiện đang giữ ${window.currentHeldBooks} cuốn. Hạn mức chỉ còn được mượn thêm ${maxCartAllowed} cuốn nữa.`;
+            Swal.fire({ title: "Đạt giới hạn", text: errorMsg, icon: "warning" });
             return;
         }
         window.cart.push({ maSach, fullTitle });
@@ -1125,14 +1199,14 @@ window.checkoutCart = async function() {
     }
 
     if (!window.userLibraryData) {
-        Swal.fire("Thông báo", "Tài khoản chưa được liên kết Thẻ Giáo viên!", "warning");
+        Swal.fire("Thông báo", "Thầy/Cô chưa có thẻ thư viện để mượn sách!", "warning");
         showSection('libraryCard', document.querySelectorAll('.nav-btn')[3]);
         return;
     }
 
     let maxCartAllowed = Math.min(window.MAX_PER_CHECKOUT, window.MAX_BOOKS_ALLOWED - window.currentHeldBooks);
     if (window.cart.length > maxCartAllowed) {
-        Swal.fire("Lỗi", "Vượt quá hạn mức cho phép. Vui lòng kiểm tra lại giỏ sách.", "error");
+        Swal.fire("Lỗi", "Vượt quá giới hạn cho phép. Vui lòng kiểm tra lại giỏ sách.", "error");
         return;
     }
 
@@ -1144,14 +1218,14 @@ window.checkoutCart = async function() {
     const payload = {
         action: "dat_sach",
         name: window.userLibraryData.name,
-        className: window.userLibraryData.class || "Giáo Viên", 
+        className: window.userLibraryData.class, 
         email: window.userLibraryData.email,
         cardId: window.userLibraryData.id,
         phone: window.userLibraryData.phone || "", 
         duration: duration,
-        maxLimit: window.MAX_BOOKS_ALLOWED, 
+        maxLimit: window.MAX_BOOKS_ALLOWED,
         books: window.cart.map(b => b.fullTitle),
-        role: window.userLibraryData.role 
+        role: window.userLibraryData.role
     };
 
     try {
@@ -1166,7 +1240,7 @@ window.checkoutCart = async function() {
         if (result.status === "success") {
             Swal.fire({
                 title: "🎉 Đặt sách thành công!",
-                text: "Đơn mượn sách đã được hệ thống ghi nhận. Cảm ơn Thầy/Cô!",
+                text: "Đơn mượn sách đã được gửi. Vui lòng theo dõi tab Trang chính hoặc Email nhé.",
                 icon: "success",
                 confirmButtonColor: "#10b981"
             });
@@ -1184,7 +1258,7 @@ window.checkoutCart = async function() {
         Swal.fire("Lỗi", "Không thể gửi đơn, vui lòng kiểm tra kết nối mạng.", "error");
     } finally {
         btn.disabled = false;
-        btn.innerHTML = "🛒 Xác nhận mượn";
+        btn.innerHTML = "🛒 Đặt hàng ngay";
     }
 }
 
@@ -1206,40 +1280,54 @@ async function checkLibraryCard(userEmail) {
   const hasCardView = document.getElementById("has-card-view");
   const noCardView = document.getElementById("no-card-view");
   try {
-    let cardData = null; let cardRole = ""; let cardId = "";
+    let cardData = null; let displayRole = ""; let cardId = ""; let baseRole = "";
     
-    const teachersRef = collection(cardDb, "teachers");
-    const qTeacher = query(teachersRef, where("email", "==", userEmail));
-    const teacherSnap = await getDocs(qTeacher);
-    
-    if (!teacherSnap.empty) {
-        cardData = teacherSnap.docs[0].data(); 
-        cardRole = cardData.chucVu || cardData.chucvu || "Giáo Viên"; 
-        cardId = cardData.teacherId || cardData.studentId || teacherSnap.docs[0].id;
+    const studentsRef = collection(cardDb, "students");
+    const qStudent = query(studentsRef, where("email", "==", userEmail));
+    const studentSnap = await getDocs(qStudent);
+
+    if (!studentSnap.empty) {
+      cardData = studentSnap.docs[0].data();
+      displayRole = `Học sinh ${cardData.class ? '- ' + cardData.class : ''}`;
+      baseRole = "Học sinh";
+      cardId = cardData.studentId || studentSnap.docs[0].id;
+      
+      // Xử lý riêng cho GV mượn form thẻ HS
+      if (cardData.class && (cardData.class.toLowerCase().includes("giáo viên") || cardData.class.toLowerCase().includes("gv"))) {
+          displayRole = "Giáo viên";
+          baseRole = "Giáo viên";
+      }
+    } else {
+      const guestsRef = collection(cardDb, "guests");
+      const qGuest = query(guestsRef, where("email", "==", userEmail));
+      const guestSnap = await getDocs(qGuest);
+      if (!guestSnap.empty) {
+        cardData = guestSnap.docs[0].data(); 
+        displayRole = "Khách ngoài trường"; 
+        baseRole = "Khách ngoài trường"; 
+        cardId = guestSnap.docs[0].id;
+      }
     }
 
     loadingCard.style.display = "none";
     
     if (cardData) {
       document.getElementById("my-card-name").textContent = cardData.name || "Chưa cập nhật tên";
-      document.getElementById("my-card-role").textContent = cardRole;
+      document.getElementById("my-card-role").textContent = displayRole; 
       document.getElementById("my-card-id").textContent = cardId;
-      document.getElementById("my-card-email").textContent = "***@***.***";
-      
-      document.getElementById("sidebar-role").textContent = cardRole;
-      
+      document.getElementById("my-card-email").textContent = cardData.email;
       hasCardView.style.display = "block"; noCardView.style.display = "none";
       
       window.userLibraryData = {
           name: cardData.name || "",
           id: cardId,
           email: cardData.email || "",
-          class: cardRole,
+          class: cardData.class || "",
           phone: cardData.phone || cardData.sdt || cardData.phoneNumber || "",
-          role: "Giáo viên" 
+          role: baseRole 
       };
 
-      // ĐÃ THÊM: TRUYỀN DỮ LIỆU ĐỊNH DANH SANG TRANG FEEDBACK (IFRAME)
+      // TRUYỀN DỮ LIỆU ĐỊNH DANH SANG TRANG FEEDBACK (IFRAME)
       const fbIframe = document.getElementById('feedback-iframe');
       if(fbIframe) {
           const params = new URLSearchParams({
@@ -1253,20 +1341,12 @@ async function checkLibraryCard(userEmail) {
       
     } else {
       hasCardView.style.display = "none"; noCardView.style.display = "block";
-      document.getElementById("sidebar-role").textContent = "Chưa có thẻ";
       window.userLibraryData = null;
     }
     window.hasCheckedCard = true;
 
   } catch (error) {
-    let errMsg = "Có lỗi quyền truy cập thẻ!";
-    if (error.message && (error.message.includes("permissions") || error.code === "permission-denied")) {
-        errMsg = "Lỗi Firebase: Chưa mở quyền đọc (Rules) cho collection 'teachers'.";
-    }
-    loadingCard.innerHTML = `
-        <p style='color:#ef4444; font-weight:bold; font-size: 16px;'>${errMsg}</p>
-        <p style='color:#64748b; font-size: 12px; margin-top: 8px;'>Chi tiết: ${error.message}</p>
-    `;
+    loadingCard.innerHTML = `<p style='color:#ef4444; font-weight:bold;'>Có lỗi quyền truy cập thẻ!</p>`;
     window.hasCheckedCard = true;
     window.userLibraryData = null;
   }
@@ -1305,7 +1385,7 @@ window.editPersonalInfo = async function() {
     if (!window.userLibraryData) return;
     const currentEmail = window.userLibraryData.email;
     const currentPhone = window.userLibraryData.phone;
-    const collectionName = "teachers";
+    const collectionName = window.userLibraryData.role.includes("Khách") ? "guests" : "students";
     const docId = window.userLibraryData.id;
 
     const { value: formValues, isDismissed } = await Swal.fire({
@@ -1320,7 +1400,7 @@ window.editPersonalInfo = async function() {
         `,
         focusConfirm: false,
         showCancelButton: true,
-        confirmButtonColor: '#3b82f6',
+        confirmButtonColor: '#0284c7',
         confirmButtonText: 'Tiếp tục <i class="fas fa-arrow-right" style="margin-left: 4px;"></i>',
         cancelButtonText: 'Hủy',
         preConfirm: () => {
@@ -1338,6 +1418,21 @@ window.editPersonalInfo = async function() {
     const phoneChanged = formValues.newPhone !== currentPhone;
 
     if (!emailChanged && !phoneChanged) return;
+
+    // BẢNG THÔNG BÁO CẢNH BÁO KHI GIÁO VIÊN TỰ ĐỔI EMAIL
+    if (emailChanged) {
+        const confirmChange = await Swal.fire({
+            title: 'CẢNH BÁO QUAN TRỌNG!',
+            html: `Việc đổi sang Email mới sẽ làm <b>xóa toàn bộ lịch sử mượn sách hiện tại</b> của Thầy/Cô trên hệ thống!<br><br>Thầy/Cô có chắc chắn muốn đổi sang Email: <b>${formValues.newEmail}</b> không?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#64748b',
+            confirmButtonText: 'Đồng ý',
+            cancelButtonText: 'Hủy'
+        });
+        if (!confirmChange.isConfirmed) return;
+    }
 
     let otpMessage = ""; let targetSend = ""; let inputsHtml = "";
     const otpInputAttr = `type="text" inputmode="numeric" maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '')"`;
@@ -1371,12 +1466,12 @@ window.editPersonalInfo = async function() {
                 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px; padding: 0 5px; margin-bottom: 10px;">
                     <span id="swal-otp-timer" style="font-size: 14px; font-weight: 600; color: #475569;"><i class="far fa-clock" style="margin-right: 4px;"></i> Hiệu lực: 05:00</span>
-                    <button type="button" id="swal-btn-resend" style="color: #2563eb; font-weight: bold; font-size: 14px; background: none; border: none; cursor: pointer; padding: 0;" disabled>Gửi lại mã (60s)</button>
+                    <button type="button" id="swal-btn-resend" style="color: #0284c7; font-weight: bold; font-size: 14px; background: none; border: none; cursor: pointer; padding: 0;" disabled>Gửi lại mã (60s)</button>
                 </div>
                 
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
                     <button type="button" id="swal-custom-cancel" style="flex: 1; background: #94a3b8; color: white; font-weight: 600; padding: 12px; border-radius: 10px; border: none; cursor: pointer; font-size: 15px;">Hủy</button>
-                    <button type="button" id="swal-custom-confirm" style="flex: 2; background: #2563eb; color: white; font-weight: 600; padding: 12px; border-radius: 10px; border: none; cursor: pointer; font-size: 15px; display: flex; justify-content: center; align-items: center;">
+                    <button type="button" id="swal-custom-confirm" style="flex: 2; background: #0284c7; color: white; font-weight: 600; padding: 12px; border-radius: 10px; border: none; cursor: pointer; font-size: 15px; display: flex; justify-content: center; align-items: center;">
                         <i class="fas fa-check-circle" style="margin-right: 8px;"></i> Xác nhận mã
                     </button>
                 </div>
@@ -1400,14 +1495,14 @@ window.editPersonalInfo = async function() {
                     timerEl.innerHTML = '<i class="fas fa-times-circle" style="margin-right: 4px;"></i> OTP hết hạn!'; 
                     timerEl.style.color = '#ef4444';
                     btnConfirm.disabled = true; btnConfirm.style.opacity = '0.5'; btnConfirm.style.cursor = 'not-allowed';
-                    resendBtn.disabled = false; resendBtn.innerText = "Gửi lại mã mới"; resendBtn.style.color = '#2563eb';
+                    resendBtn.disabled = false; resendBtn.innerText = "Gửi lại mã mới"; resendBtn.style.color = '#0284c7';
                 } else {
                     let m = Math.floor(remaining / 60).toString().padStart(2, '0'); let s = (remaining % 60).toString().padStart(2, '0');
                     timerEl.innerHTML = '<i class="far fa-clock" style="margin-right: 4px;"></i> Hiệu lực: ' + m + ':' + s;
                     btnConfirm.disabled = false; btnConfirm.style.opacity = '1'; btnConfirm.style.cursor = 'pointer';
                 }
                 let resendRemaining = 60 - elapsed;
-                if (resendRemaining <= 0 && remaining > 0) { resendBtn.disabled = false; resendBtn.innerText = "Gửi lại mã"; resendBtn.style.color = '#2563eb'; } 
+                if (resendRemaining <= 0 && remaining > 0) { resendBtn.disabled = false; resendBtn.innerText = "Gửi lại mã"; resendBtn.style.color = '#0284c7'; } 
                 else if (remaining > 0) { resendBtn.disabled = true; resendBtn.innerText = 'Gửi lại mã (' + resendRemaining + 's)'; resendBtn.style.color = '#94a3b8'; }
             };
 
@@ -1453,7 +1548,7 @@ window.editPersonalInfo = async function() {
         // 1. Cập nhật thẻ trên Firebase
         await updateDoc(docRef, { phone: formValues.newPhone, email: formValues.newEmail });
         
-        // 2. Gửi lệnh báo cho Excel cập nhật (Đồng bộ Email lịch sử)
+        // 2. Gửi lệnh báo cho Excel cập nhật (Đồng bộ Xóa dữ liệu cũ)
         await fetch(WEB_APP_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -1466,7 +1561,7 @@ window.editPersonalInfo = async function() {
         });
         
         if (emailChanged) {
-             await Swal.fire({title: 'Hoàn tất!', text: 'Email đã được đổi! Toàn bộ lịch sử sách đang mượn đã được tự động chuyển sang Email mới. Vui lòng đăng nhập lại.', icon: 'success'});
+             await Swal.fire({title: 'Hoàn tất!', text: 'Email đã được đổi! Toàn bộ lịch sử mượn sách liên kết với Email cũ đã được xoá khỏi hệ thống. Vui lòng đăng nhập lại.', icon: 'success'});
              window.logout(); 
         } else {
              Swal.fire({title: 'Hoàn tất!', text: 'Số điện thoại đã được cập nhật đồng bộ.', icon: 'success', timer: 2000, showConfirmButton: false});
@@ -1502,6 +1597,7 @@ window.showSection=function(id,btn){
       if (user && user.email) loadData(user.email, true);
   }
 }
+
 </script>
 </body>
 </html>
